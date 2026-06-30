@@ -1,6 +1,16 @@
-// casper-js-sdk ships as CommonJS; some named exports aren't detected by the
-// ESM named-import lexer, so import the module object and destructure.
-import casperSdk from 'casper-js-sdk';
+// casper-js-sdk ships as CommonJS (__esModule: true) and the two bundlers we run
+// under disagree on interop, so neither import form works everywhere:
+//  - tsx/esbuild puts the SDK classes on the DEFAULT import; its cjs lexer does
+//    not surface every named export, so the namespace is incomplete.
+//  - Next.js/webpack (as an external module) leaves the default `undefined` and
+//    exposes the classes on the NAMESPACE.
+// Import both and pick whichever form actually carries the SDK classes.
+import casperDefault from 'casper-js-sdk';
+import * as casperNamespace from 'casper-js-sdk';
+const casperSdk: typeof casperNamespace =
+  (casperDefault as unknown as { RpcClient?: unknown })?.RpcClient
+    ? (casperDefault as unknown as typeof casperNamespace)
+    : casperNamespace;
 const {
   RpcClient,
   HttpHandler,

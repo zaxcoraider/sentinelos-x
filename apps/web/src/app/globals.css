@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 240 10% 4%;
+  --foreground: 0 0% 98%;
+  --card: 240 8% 6%;
+  --card-foreground: 0 0% 98%;
+  --muted: 240 5% 12%;
+  --muted-foreground: 240 5% 60%;
+  --border: 240 6% 16%;
+  --input: 240 6% 16%;
+  --ring: 240 5% 40%;
+  --radius: 0.75rem;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  background-image:
+    radial-gradient(60% 50% at 50% 0%, hsl(240 30% 14% / 0.5), transparent 70%);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
