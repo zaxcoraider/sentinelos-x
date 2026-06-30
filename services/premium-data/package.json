@@ -1,0 +1,18 @@
+{
+  "name": "@sentinelos/premium-data",
+  "version": "0.1.0",
+  "description": "x402-gated premium volatility feed (HTTP 402 paywall) for the SentinelOS agents",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

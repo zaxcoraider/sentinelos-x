@@ -1,0 +1,24 @@
+{
+  "name": "@sentinelos/agents",
+  "version": "0.1.0",
+  "description": "SentinelOS agent loop — Commander / Risk / Treasury orchestrator on Claude, writing to Casper",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "agent": "tsx scripts/run-agent.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.107.0",
+    "@sentinelos/casper": "0.1.0",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

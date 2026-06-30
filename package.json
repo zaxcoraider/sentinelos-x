@@ -5,6 +5,7 @@
   "description": "SentinelOS X — autonomous treasury sentinel on Casper",
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/*",
+    "services/*"
   ]
 }

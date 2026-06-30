@@ -15,8 +15,10 @@ const {
   RpcClient,
   HttpHandler,
   PrivateKey,
+  PublicKey,
   KeyAlgorithm,
   ContractCallBuilder,
+  NativeTransferBuilder,
   Args,
   CLValue,
   Timestamp,
@@ -30,6 +32,7 @@ import {
   CONTRACT_HASH,
   readSecretKeyPem,
   PAYMENT_RECORD_ACTION,
+  PAYMENT_NATIVE_TRANSFER,
   explorerTxUrl,
 } from './config.js';
 import { varKey, mappingKeyString, FIELD, decodeU64, decodeU8, decodeString } from './storage.js';
@@ -82,6 +85,44 @@ export async function recordAction(
     .runtimeArgs(args)
     .chainName(CHAIN_NAME)
     .payment(PAYMENT_RECORD_ACTION)
+    .timestamp(timestamp)
+    .build();
+
+  tx.sign(key);
+
+  const res = await getRpc().putTransaction(tx);
+  const txHash = res.transactionHash.toHex();
+  return { txHash, explorerUrl: explorerTxUrl(txHash) };
+}
+
+export interface TransferResult {
+  txHash: string;
+  explorerUrl: string;
+}
+
+/**
+ * Signs and submits a native CSPR transfer — the on-chain settlement leg of an
+ * x402 payment. Pays `amountMotes` to `targetPublicKeyHex` (defaults to the
+ * sentinel's own key, i.e. a real self-transfer for demo settlement). Minimum
+ * native transfer on Casper is 2.5 CSPR (2,500,000,000 motes).
+ */
+export async function transferCspr(
+  amountMotes: number | bigint | string,
+  { targetPublicKeyHex }: { targetPublicKeyHex?: string } = {},
+): Promise<TransferResult> {
+  const key = loadKey();
+  const target = targetPublicKeyHex ? PublicKey.fromHex(targetPublicKeyHex) : key.publicKey;
+
+  const offsetSec = Number(process.env.CASPER_TS_OFFSET_SEC ?? 60);
+  const timestamp = new Timestamp(new Date(Date.now() - offsetSec * 1000));
+
+  const tx = new NativeTransferBuilder()
+    .from(key.publicKey)
+    .target(target)
+    .amount(String(amountMotes))
+    .id(Date.now())
+    .chainName(CHAIN_NAME)
+    .payment(PAYMENT_NATIVE_TRANSFER)
     .timestamp(timestamp)
     .build();
 

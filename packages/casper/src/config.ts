@@ -28,6 +28,8 @@ export const PACKAGE_HASH = bareHex(required('TREASURY_GUARD_PACKAGE_HASH'));
 export const CONTRACT_HASH = bareHex(required('TREASURY_GUARD_CONTRACT_HASH'));
 export const SECRET_KEY_PATH = resolve(REPO_ROOT, process.env.CASPER_SECRET_KEY_PATH ?? './keys/secret_key.pem');
 export const PAYMENT_RECORD_ACTION = Number(process.env.CASPER_CALL_PAYMENT ?? 20_000_000_000);
+/** Gas payment for a native CSPR transfer (the x402 settlement). 0.1 CSPR. */
+export const PAYMENT_NATIVE_TRANSFER = Number(process.env.CASPER_TRANSFER_PAYMENT ?? 100_000_000);
 export const EXPLORER_BASE = 'https://testnet.cspr.live';
 
 export function readSecretKeyPem(): string {
