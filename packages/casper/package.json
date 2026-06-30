@@ -1,0 +1,24 @@
+{
+  "name": "@sentinelos/casper",
+  "version": "0.1.0",
+  "description": "Casper 2.0 interaction layer for TreasuryGuard (recordAction + readState)",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "demo": "tsx scripts/demo-tx.ts",
+    "read": "tsx scripts/read-state.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.8.0",
+    "casper-js-sdk": "5.0.12",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "sentinelos-x",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SentinelOS X — autonomous treasury sentinel on Casper",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
+}
