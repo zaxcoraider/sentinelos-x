@@ -27,6 +27,12 @@ coverage/
 *.swp
 *~
 
+# Local session notes (not for repo)
+DEVLOG.md
+
 # OS
 .DS_Store
 Thumbs.db
+
+# pre-lowering wasm backup (local only)
+*.raw.wasm

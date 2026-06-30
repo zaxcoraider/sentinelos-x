@@ -1,0 +1,3 @@
+[workspace]
+members = ["contracts/treasury_guard"]
+resolver = "2"

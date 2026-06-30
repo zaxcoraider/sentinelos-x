@@ -1,0 +1,7 @@
+[target.wasm32-unknown-unknown]
+rustflags = [
+    "-C", "link-arg=-zstack-size=65536",
+    "-C", "link-arg=--allow-undefined",
+    "-C", "target-feature=-bulk-memory",
+    "--cfg", "odra_module=\"TreasuryGuard\"",
+]
