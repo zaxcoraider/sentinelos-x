@@ -6,6 +6,7 @@ import {
   Network,
   Zap,
   Bot,
+  Landmark,
   ShieldAlert,
   BarChart3,
   Store,
@@ -25,6 +26,7 @@ const LIVE_NAV: NavItem[] = [
   { label: 'Mission Control', href: '/', icon: Network },
   { label: 'Crisis Response', href: '/crisis', icon: Zap },
   { label: 'Agent Team', href: '/agents', icon: Bot },
+  { label: 'Governance', href: '/governance', icon: Landmark },
   { label: 'Security Center', href: '/security', icon: ShieldAlert },
 ];
 
