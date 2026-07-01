@@ -41,6 +41,17 @@ actually happens, with the tx hashes linking out to cspr.live.
 
 ---
 
+## Screenshots
+
+| | |
+|---|---|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Agent Team](docs/screenshots/agent-team.png) |
+| ![Crisis Response — live agent trace](docs/screenshots/crisis-trace.png) | ![Security Center](docs/screenshots/security-center.png) |
+
+*Dashboard · Agent Team · Crisis Response (live agent trace) · Security Center — all on live Casper Testnet state.*
+
+---
+
 ## What's live vs. roadmap (we never label mock data as real)
 
 ### Agents
