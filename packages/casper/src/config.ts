@@ -38,6 +38,14 @@ export const CSPR_CLOUD_API_KEY = process.env.CSPR_CLOUD_API_KEY ?? '';
 export const PUBLIC_KEY_HEX = process.env.CASPER_PUBLIC_KEY_HEX ?? '';
 
 export function readSecretKeyPem(): string {
+  // On a serverless host (Vercel) there is no key file — allow the PEM to be
+  // injected via env: CASPER_SECRET_KEY_B64 (base64, preferred) or
+  // CASPER_SECRET_KEY_PEM (raw, with literal \n allowed). Falls back to the
+  // local file for dev.
+  const b64 = process.env.CASPER_SECRET_KEY_B64;
+  if (b64) return Buffer.from(b64, 'base64').toString('utf8');
+  const raw = process.env.CASPER_SECRET_KEY_PEM;
+  if (raw) return raw.includes('\\n') ? raw.replace(/\\n/g, '\n') : raw;
   return readFileSync(SECRET_KEY_PATH, 'utf8');
 }
 
