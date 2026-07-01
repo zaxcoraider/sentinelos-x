@@ -27,6 +27,14 @@
   border-color: hsl(var(--border));
 }
 
+/* Hide the native cursor only when the custom reticle is active on a mouse. */
+@media (pointer: fine) {
+  html.cursor-custom,
+  html.cursor-custom * {
+    cursor: none !important;
+  }
+}
+
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
