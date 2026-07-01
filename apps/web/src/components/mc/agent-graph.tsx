@@ -1,46 +1,53 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import {
+  ShieldAlert,
+  Coins,
+  Landmark,
+  Radio,
+  ScrollText,
+  LineChart,
+  Umbrella,
+  Lock,
+  BrainCircuit,
+  type LucideIcon,
+} from 'lucide-react';
 import type { AgentRole } from '@sentinelos/agents';
 
-const COLORS: Record<AgentRole, string> = {
-  Commander: '#2563EB',
-  Risk: '#F59E0B',
-  Treasury: '#22C55E',
-  Governance: '#8B5CF6',
-};
-const MUTED = '#6B7280';
-
-interface Node {
-  id: AgentRole;
-  x: number;
-  y: number;
-  label: string;
+interface GNode {
+  id: string;
+  live: boolean; // wired to the real pipeline
   role: string;
+  label: string;
+  color: string;
+  icon: LucideIcon;
+  angle: number; // degrees around the hub
 }
 
-const NODES: Node[] = [
-  { id: 'Commander', x: 320, y: 74, label: 'Commander', role: 'Orchestrator' },
-  { id: 'Risk', x: 150, y: 182, label: 'Risk', role: 'Threat scoring' },
-  { id: 'Treasury', x: 320, y: 212, label: 'Treasury', role: 'Action' },
-  { id: 'Governance', x: 490, y: 182, label: 'Governance', role: 'Proposal' },
-];
-const NODE_BY_ID = Object.fromEntries(NODES.map((n) => [n.id, n])) as Record<AgentRole, Node>;
+const CX = 360;
+const CY = 210;
+const RX = 262;
+const RY = 150;
 
-const ROADMAP: { id: string; x: number; y: number }[] = [
-  { id: 'Oracle', x: 108, y: 322 },
-  { id: 'Compliance', x: 245, y: 350 },
-  { id: 'Analytics', x: 395, y: 350 },
-  { id: 'Insurance', x: 532, y: 322 },
-];
-
-const EDGES: { from: AgentRole; to: AgentRole }[] = [
-  { from: 'Risk', to: 'Commander' },
-  { from: 'Commander', to: 'Treasury' },
-  { from: 'Treasury', to: 'Governance' },
+// 8 agents around the Commander hub. The four "live" ones (Risk, Treasury,
+// Governance + the Commander hub) are wired to the real pipeline; the rest are
+// roadmap agents rendered dimmer — the same set shown as "Coming in v1".
+const NODES: GNode[] = [
+  { id: 'Risk', live: true, role: 'Threat scoring', label: 'Risk Agent', color: '#F59E0B', icon: ShieldAlert, angle: 270 },
+  { id: 'Governance', live: true, role: 'Proposal', label: 'Governance', color: '#8B5CF6', icon: Landmark, angle: 318 },
+  { id: 'Oracle', live: false, role: 'Data feeds', label: 'Oracle', color: '#38BDF8', icon: Radio, angle: 12 },
+  { id: 'Compliance', live: false, role: 'Checks', label: 'Compliance', color: '#2DD4BF', icon: ScrollText, angle: 55 },
+  { id: 'Analytics', live: false, role: 'Insights', label: 'Analytics', color: '#F97316', icon: LineChart, angle: 90 },
+  { id: 'Insurance', live: false, role: 'Coverage', label: 'Insurance', color: '#A78BFA', icon: Umbrella, angle: 125 },
+  { id: 'Security', live: false, role: 'Defense', label: 'Security', color: '#EF4444', icon: Lock, angle: 168 },
+  { id: 'Treasury', live: true, role: 'Action', label: 'Treasury', color: '#22C55E', icon: Coins, angle: 222 },
 ];
 
-const HUB_LINKS: AgentRole[] = ['Risk', 'Treasury', 'Governance'];
+function pos(angle: number) {
+  const rad = (angle * Math.PI) / 180;
+  return { x: CX + RX * Math.cos(rad), y: CY + RY * Math.sin(rad) };
+}
 
 export function AgentGraph({
   activeAgent,
@@ -52,125 +59,150 @@ export function AgentGraph({
   running: boolean;
 }) {
   return (
-    <svg viewBox="0 0 640 400" className="h-full w-full" role="img" aria-label="Live agent network">
-      {/* faint orchestration links from the Commander hub */}
-      {HUB_LINKS.map((id) => {
-        const a = NODE_BY_ID.Commander;
-        const b = NODE_BY_ID[id];
-        return (
-          <line
-            key={`hub-${id}`}
-            x1={a.x}
-            y1={a.y}
-            x2={b.x}
-            y2={b.y}
-            stroke={MUTED}
-            strokeOpacity={0.12}
-            strokeWidth={1}
-          />
-        );
-      })}
+    <svg viewBox="0 0 720 440" className="h-full w-full" role="img" aria-label="Live agent network">
+      <defs>
+        <radialGradient id="hub-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#2563EB" stopOpacity="0.5" />
+          <stop offset="60%" stopColor="#2563EB" stopOpacity="0.12" />
+          <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
+        </radialGradient>
+      </defs>
 
-      {/* dim links out to the roadmap ring */}
-      {ROADMAP.map((r) => (
-        <line
-          key={`rl-${r.id}`}
-          x1={NODE_BY_ID.Commander.x}
-          y1={NODE_BY_ID.Commander.y}
-          x2={r.x}
-          y2={r.y}
-          stroke={MUTED}
-          strokeOpacity={0.08}
-          strokeWidth={1}
-          strokeDasharray="2 5"
-        />
-      ))}
+      {/* hub ambient glow */}
+      <circle cx={CX} cy={CY} r={150} fill="url(#hub-glow)" opacity={running ? 0.9 : 0.55} />
 
-      {/* main flow edges */}
-      {EDGES.map((e) => {
-        const a = NODE_BY_ID[e.from];
-        const b = NODE_BY_ID[e.to];
-        const bothSeen = seenAgents.has(e.from) && seenAgents.has(e.to);
-        const isActive = running && activeAgent === e.to && seenAgents.has(e.from);
-        const color = COLORS[e.to];
+      {/* rotating orbit rings for depth */}
+      <g className="mc-spin-slow" style={{ transformOrigin: `${CX}px ${CY}px` }}>
+        <ellipse cx={CX} cy={CY} rx={RX} ry={RY} fill="none" stroke="#6B7280" strokeOpacity={0.12} strokeDasharray="3 9" />
+      </g>
+      <g className="mc-spin-slow-rev" style={{ transformOrigin: `${CX}px ${CY}px` }}>
+        <ellipse cx={CX} cy={CY} rx={RX * 0.62} ry={RY * 0.62} fill="none" stroke="#6B7280" strokeOpacity={0.1} strokeDasharray="2 10" />
+      </g>
+
+      {/* edges + flowing packets */}
+      {NODES.map((n, i) => {
+        const p = pos(n.angle);
+        const isActive = running && n.live && activeAgent === n.id;
+        const seen = n.live && seenAgents.has(n.id as AgentRole);
+        const baseColor = n.live ? n.color : '#6B7280';
+        const edgeOpacity = isActive ? 0.9 : seen ? 0.45 : n.live ? 0.22 : 0.1;
+
         return (
-          <g key={`${e.from}-${e.to}`}>
+          <g key={`edge-${n.id}`}>
             <line
-              x1={a.x}
-              y1={a.y}
-              x2={b.x}
-              y2={b.y}
-              stroke={bothSeen || isActive ? color : MUTED}
-              strokeOpacity={isActive ? 0.9 : bothSeen ? 0.5 : 0.18}
-              strokeWidth={isActive ? 2 : 1.5}
+              x1={CX}
+              y1={CY}
+              x2={p.x}
+              y2={p.y}
+              stroke={baseColor}
+              strokeOpacity={edgeOpacity}
+              strokeWidth={isActive ? 2.2 : 1.2}
               className={isActive ? 'mc-edge-active' : undefined}
             />
-            {isActive && (
-              <motion.circle
-                r={4}
-                fill={color}
-                initial={{ cx: a.x, cy: a.y }}
-                animate={{ cx: [a.x, b.x], cy: [a.y, b.y] }}
-                transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            )}
+            {/* continuous ambient packet — every edge stays gently alive */}
+            <motion.circle
+              r={isActive ? 3.4 : 2}
+              fill={baseColor}
+              fillOpacity={n.live ? 1 : 0.5}
+              initial={false}
+              animate={{ cx: [CX, p.x], cy: [CY, p.y] }}
+              transition={{
+                duration: isActive ? 0.9 : n.live ? 2.4 : 3.4,
+                repeat: Infinity,
+                ease: 'linear',
+                delay: (i % 4) * 0.5,
+              }}
+              style={{ filter: isActive ? `drop-shadow(0 0 5px ${baseColor})` : undefined }}
+            />
           </g>
         );
       })}
 
-      {/* roadmap nodes (greyed — Coming in v1) */}
-      {ROADMAP.map((r) => (
-        <g key={r.id}>
-          <circle cx={r.x} cy={r.y} r={13} fill="#0e1420" stroke={MUTED} strokeOpacity={0.4} strokeWidth={1} />
-          <circle cx={r.x} cy={r.y} r={3} fill={MUTED} fillOpacity={0.5} />
-          <text x={r.x} y={r.y + 28} textAnchor="middle" fontSize={10} fill={MUTED} fillOpacity={0.7}>
-            {r.id}
-          </text>
-        </g>
-      ))}
-
-      {/* live agent nodes */}
+      {/* agent nodes */}
       {NODES.map((n) => {
-        const color = COLORS[n.id];
-        const isActive = activeAgent === n.id;
-        const isDone = seenAgents.has(n.id) && !isActive;
-        const glow = isActive || (!running && !isDone);
+        const p = pos(n.angle);
+        const Icon = n.icon;
+        const isActive = running && n.live && activeAgent === n.id;
+        const seen = n.live && seenAgents.has(n.id as AgentRole);
+        const bright = isActive || seen || (!running && n.live);
+        const ringColor = n.live ? n.color : '#6B7280';
+        const ringOpacity = isActive ? 1 : bright ? 0.85 : n.live ? 0.5 : 0.35;
+
         return (
           <g key={n.id}>
-            {/* pulsing halo when active (or gentle breathing at rest) */}
-            {glow && (
+            {/* pulsing halo — strong when active, gentle breathing when live-idle */}
+            {(isActive || (!running && n.live)) && (
               <motion.circle
-                cx={n.x}
-                cy={n.y}
-                r={24}
+                cx={p.x}
+                cy={p.y}
+                r={26}
                 fill="none"
-                stroke={color}
+                stroke={n.color}
                 strokeWidth={isActive ? 2 : 1}
                 initial={{ opacity: 0.5, scale: 1 }}
-                animate={{ opacity: [0.5, 0], scale: [1, isActive ? 1.9 : 1.4] }}
-                transition={{ duration: isActive ? 1.2 : 2.4, repeat: Infinity, ease: 'easeOut' }}
-                style={{ transformOrigin: `${n.x}px ${n.y}px` }}
+                animate={{ opacity: [0.5, 0], scale: [1, isActive ? 2 : 1.5] }}
+                transition={{ duration: isActive ? 1.1 : 2.6, repeat: Infinity, ease: 'easeOut' }}
+                style={{ transformOrigin: `${p.x}px ${p.y}px` }}
               />
             )}
             <circle
-              cx={n.x}
-              cy={n.y}
-              r={24}
-              fill="#0e1420"
-              stroke={color}
-              strokeOpacity={isActive ? 1 : isDone ? 0.9 : 0.45}
+              cx={p.x}
+              cy={p.y}
+              r={26}
+              fill="#0b111d"
+              stroke={ringColor}
+              strokeOpacity={ringOpacity}
               strokeWidth={isActive ? 2.5 : 1.5}
+              style={{ filter: bright ? `drop-shadow(0 0 8px ${n.color}80)` : undefined }}
             />
-            <circle cx={n.x} cy={n.y} r={7} fill={color} fillOpacity={isActive ? 1 : isDone ? 0.9 : 0.35} />
-            <text x={n.x} y={n.y + 40} textAnchor="middle" fontSize={12} fontWeight={600} fill="#E5E7EB">
+            <foreignObject x={p.x - 12} y={p.y - 12} width={24} height={24}>
+              <div className="flex h-6 w-6 items-center justify-center">
+                <Icon width={16} height={16} color={n.color} opacity={n.live ? 1 : 0.55} />
+              </div>
+            </foreignObject>
+            <text x={p.x} y={p.y + 42} textAnchor="middle" fontSize={12} fontWeight={600} fill={n.live ? '#E5E7EB' : '#9CA3AF'}>
               {n.label}
             </text>
-            <text x={n.x} y={n.y + 54} textAnchor="middle" fontSize={9} fill={MUTED}>
-              {n.role}
+            <text x={p.x} y={p.y + 56} textAnchor="middle" fontSize={9} fill="#6B7280">
+              {n.live ? n.role : 'v1'}
             </text>
           </g>
         );
       })}
+
+      {/* Commander hub */}
+      <motion.circle
+        cx={CX}
+        cy={CY}
+        r={44}
+        fill="none"
+        stroke="#2563EB"
+        strokeWidth={1.5}
+        strokeOpacity={0.6}
+        animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.08, 1] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ transformOrigin: `${CX}px ${CY}px` }}
+      />
+      <circle
+        cx={CX}
+        cy={CY}
+        r={40}
+        fill="#0b111d"
+        stroke="#2563EB"
+        strokeWidth={2.5}
+        style={{ filter: 'drop-shadow(0 0 14px #2563EBaa)' }}
+      />
+      <foreignObject x={CX - 16} y={CY - 20} width={32} height={32}>
+        <div className="flex h-8 w-8 items-center justify-center">
+          <BrainCircuit width={26} height={26} color="#60A8FF" className={running ? 'mc-breathe' : undefined} />
+        </div>
+      </foreignObject>
+      <text x={CX} y={CY + 30} textAnchor="middle" fontSize={12} fontWeight={700} fill="#E5E7EB">
+        Commander
+      </text>
+      <text x={CX} y={CY + 44} textAnchor="middle" fontSize={9} fill="#8AB4F8">
+        AI Orchestrator
+      </text>
     </svg>
   );
 }

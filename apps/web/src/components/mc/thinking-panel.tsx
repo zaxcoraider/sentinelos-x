@@ -1,163 +1,116 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Cpu, Loader2, Check, ArrowUpRight, ShieldCheck } from 'lucide-react';
+import { Loader2, Check } from 'lucide-react';
 import type { TraceStep, PipelineResult, AgentRole } from '@sentinelos/agents';
-import { Button } from '@/components/ui/button';
 import { AGENT_META } from './agent-meta';
-import { cn, shortHash } from '@/lib/utils';
+import { MeterBar } from './primitives';
 
-interface TxInfo {
-  txHash: string;
-  explorerUrl: string;
-}
+const STANDBY_CHECKS = [
+  'Agents online',
+  'Casper Testnet connected',
+  'TreasuryGuard contract live',
+  'Market feed streaming',
+];
 
 export function ThinkingPanel({
   steps,
   result,
   running,
   activeAgent,
-  onApprove,
-  approving,
-  approvedTx,
 }: {
   steps: TraceStep[];
   result: PipelineResult | null;
   running: boolean;
   activeAgent: AgentRole | null;
-  onApprove: () => void;
-  approving: boolean;
-  approvedTx: TxInfo | null;
 }) {
-  const decision = result?.decision ?? null;
-  const gov = result?.governance ?? null;
   const activeMeta = activeAgent ? AGENT_META[activeAgent] : null;
+  const confidence = result?.decision?.confidence ?? null;
+  const idle = steps.length === 0 && !running;
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        <Cpu className="h-3.5 w-3.5 text-ai" />
-        AI reasoning
-        {running && activeMeta && (
-          <span className="ml-auto inline-flex items-center gap-1.5 text-[11px]" style={{ color: activeMeta.color }}>
-            <Loader2 className="h-3 w-3 animate-spin" />
-            {activeMeta.label} thinking…
-          </span>
-        )}
+      {/* active-agent banner */}
+      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-ai/15 text-ai">
+          <motion.span
+            animate={running ? { scale: [1, 1.15, 1] } : {}}
+            transition={{ duration: 1.4, repeat: Infinity }}
+          >
+            {activeMeta ? <activeMeta.icon className="h-4 w-4" style={{ color: activeMeta.color }} /> : null}
+            {!activeMeta && <Check className="h-4 w-4" />}
+          </motion.span>
+        </span>
+        <div className="leading-tight">
+          <div className="text-sm font-semibold" style={activeMeta ? { color: activeMeta.color } : undefined}>
+            {activeMeta ? activeMeta.label : 'Commander'}
+          </div>
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            {running ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" /> Thinking…
+              </>
+            ) : idle ? (
+              'Standby'
+            ) : (
+              'Reasoning complete'
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="mc-scroll flex-1 space-y-4 overflow-y-auto px-4 py-4">
-        {steps.length === 0 && !running && (
-          <div className="flex h-full min-h-[120px] items-center justify-center text-center text-xs text-muted-foreground">
-            The agents&apos; reasoning appears here as they work.
-          </div>
-        )}
-
-        {/* reasoning checklist */}
-        {steps.length > 0 && (
-          <ul className="space-y-2">
-            {steps.map((s, i) => {
+      <div className="mc-scroll flex-1 space-y-2 overflow-y-auto px-4 py-4">
+        {idle
+          ? STANDBY_CHECKS.map((c, i) => (
+              <motion.div
+                key={c}
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.08 }}
+                className="flex items-center gap-2 text-xs"
+              >
+                <Check className="h-3.5 w-3.5 shrink-0 text-success" />
+                <span className="text-foreground/70">{c}</span>
+                <span className="ml-auto font-mono text-[11px] text-success">OK</span>
+              </motion.div>
+            ))
+          : steps.map((s, i) => {
               const meta = AGENT_META[s.agent];
               const last = i === steps.length - 1;
               return (
-                <li key={`${s.agent}-${i}`} className="flex items-start gap-2 text-xs">
+                <motion.div
+                  key={`${s.agent}-${i}`}
+                  initial={{ opacity: 0, x: -6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-start gap-2 text-xs"
+                >
                   {running && last ? (
                     <Loader2 className="mt-0.5 h-3.5 w-3.5 shrink-0 animate-spin" style={{ color: meta.color }} />
                   ) : (
                     <Check className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: meta.color }} />
                   )}
                   <span className="text-foreground/80">{s.summary}</span>
-                </li>
+                </motion.div>
               );
             })}
-          </ul>
-        )}
-
-        {/* Treasury recommendation — human in the loop */}
-        <AnimatePresence>
-          {decision && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="rounded-lg border border-success/30 bg-success/5 p-4"
-            >
-              <div className="text-[10px] font-medium uppercase tracking-wider text-success">Treasury recommendation</div>
-              <div className="mt-1 text-lg font-semibold">{decision.action}</div>
-              <p className="mt-1 text-xs text-muted-foreground">{decision.reasoning}</p>
-
-              <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
-                <div>
-                  <div className="text-muted-foreground">Protected</div>
-                  <div className="font-mono text-sm font-semibold text-success">
-                    ~${Math.round(decision.expectedSavingsUsd).toLocaleString()}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-muted-foreground">Confidence</div>
-                  <div className="mt-1 flex items-center gap-2">
-                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                      <div className="h-full rounded-full bg-success" style={{ width: `${decision.confidence}%` }} />
-                    </div>
-                    <span className="font-mono text-xs">{decision.confidence}%</span>
-                  </div>
-                </div>
-              </div>
-
-              {approvedTx ? (
-                <a
-                  href={approvedTx.explorerUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-xs font-medium text-success hover:bg-success/15"
-                >
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  Approved · recorded {shortHash(approvedTx.txHash)}
-                  <ArrowUpRight className="h-3 w-3" />
-                </a>
-              ) : (
-                <div className="mt-3 flex items-center gap-2">
-                  <Button
-                    onClick={onApprove}
-                    disabled={approving}
-                    className="flex-1 bg-success text-background hover:bg-success/90"
-                  >
-                    {approving && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {approving ? 'Recording…' : 'Approve'}
-                  </Button>
-                  <Button variant="outline" disabled={approving} className="flex-1">
-                    Reject
-                  </Button>
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Governance consensus */}
-        <AnimatePresence>
-          {gov && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="rounded-lg border border-ai/30 bg-ai/5 p-4"
-            >
-              <div className="text-[10px] font-medium uppercase tracking-wider text-ai">Governance consensus</div>
-              <div className="mt-1 text-sm font-semibold">{gov.title}</div>
-              <div className={cn('mt-2 flex flex-wrap gap-3 text-[11px] text-muted-foreground')}>
-                <span>
-                  Action <span className="font-mono text-foreground">{gov.action}</span>
-                </span>
-                <span>
-                  Quorum <span className="text-foreground">{gov.quorumPercent}%</span>
-                </span>
-                <span>
-                  Window <span className="text-foreground">{gov.votingWindowHours}h</span>
-                </span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
+
+      {/* overall confidence */}
+      <AnimatePresence>
+        {confidence !== null && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="overflow-hidden border-t border-border px-4 py-3"
+          >
+            <div className="mb-1.5 flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">Overall Confidence</span>
+              <span className="font-mono font-semibold text-ai">{confidence}%</span>
+            </div>
+            <MeterBar value={confidence} tone="167, 139, 250" />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

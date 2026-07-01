@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, ArrowUpRight, Radio } from 'lucide-react';
+import { Loader2, ArrowUpRight } from 'lucide-react';
 import type { TraceStep } from '@sentinelos/agents';
 import { AGENT_META } from './agent-meta';
 import { cn, shortHash } from '@/lib/utils';
@@ -13,10 +13,6 @@ function clock(at: string) {
 export function EventTimeline({ steps, running }: { steps: TraceStep[]; running: boolean }) {
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        <Radio className="h-3.5 w-3.5 text-success" />
-        Live event timeline
-      </div>
       <div className="mc-scroll flex-1 overflow-y-auto px-4 py-4">
         {steps.length === 0 && !running && (
           <div className="flex h-full min-h-[120px] items-center justify-center text-center text-xs text-muted-foreground">
@@ -39,7 +35,7 @@ export function EventTimeline({ steps, running }: { steps: TraceStep[]; running:
                 >
                   <span
                     className="absolute -left-[26px] top-1 flex h-3 w-3 items-center justify-center rounded-full ring-4 ring-background"
-                    style={{ backgroundColor: meta.color }}
+                    style={{ backgroundColor: meta.color, boxShadow: `0 0 8px ${meta.color}` }}
                   />
                   <div className="flex items-center gap-2">
                     <Icon className="h-3.5 w-3.5" style={{ color: meta.color }} />

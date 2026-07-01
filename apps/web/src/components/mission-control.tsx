@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import { Zap, Loader2, Network } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Zap, Loader2, Network, Cpu, Radar, Receipt, Radio, Coins } from 'lucide-react';
 import type { TraceStep } from '@sentinelos/agents';
 import { Button } from '@/components/ui/button';
 import { fetchState, recordTreasuryAction } from '@/app/actions';
@@ -11,6 +12,10 @@ import { LiveMarket } from '@/components/mc/live-market';
 import { AgentGraph } from '@/components/mc/agent-graph';
 import { EventTimeline } from '@/components/mc/event-timeline';
 import { ThinkingPanel } from '@/components/mc/thinking-panel';
+import { ThreatRadar } from '@/components/mc/threat-radar';
+import { TransactionFeed } from '@/components/mc/transaction-feed';
+import { TreasuryRecommendation } from '@/components/mc/treasury-recommendation';
+import { StatusBar } from '@/components/mc/status-bar';
 import { cn } from '@/lib/utils';
 
 interface TxInfo {
@@ -27,6 +32,7 @@ function severityFromSteps(steps: TraceStep[]): number | null {
 function Panel({
   title,
   icon: Icon,
+  tone,
   right,
   className,
   bodyClassName,
@@ -34,16 +40,24 @@ function Panel({
 }: {
   title: string;
   icon?: typeof Network;
+  tone?: string; // rgb triple for the icon tile
   right?: React.ReactNode;
   className?: string;
   bodyClassName?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className={cn('flex flex-col overflow-hidden rounded-xl border border-border bg-card-elevated/40', className)}>
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        {Icon && <Icon className="h-3.5 w-3.5" />}
-        {title}
+    <section className={cn('mc-panel flex flex-col overflow-hidden', className)}>
+      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+        {Icon && (
+          <span
+            className="flex h-6 w-6 items-center justify-center rounded-md"
+            style={tone ? { background: `rgb(${tone} / 0.14)`, color: `rgb(${tone})` } : undefined}
+          >
+            <Icon className="h-3.5 w-3.5" />
+          </span>
+        )}
+        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{title}</span>
         {right && <div className="ml-auto">{right}</div>}
       </div>
       <div className={cn('flex-1', bodyClassName)}>{children}</div>
@@ -57,19 +71,16 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
   const [approving, setApproving] = useState(false);
   const [approvedTx, setApprovedTx] = useState<TxInfo | null>(null);
 
-  // Real-time operational threat: null at standby (no active incident → healthy),
-  // spikes to the Risk score during a run, and returns to resolved once the
-  // treasury has acted (routed). Historical severity lives in the Security Center.
   const severity = useMemo(() => {
     if (running) return severityFromSteps(steps);
     if (phase === 'done') return result?.routed ? 0 : (result?.severity ?? severityFromSteps(steps));
     return null;
   }, [running, phase, result, steps]);
 
+  const protectedUsd = result?.decision ? Math.round(result.decision.expectedSavingsUsd) : 0;
+
   const onTrigger = useCallback(() => {
     setApprovedTx(null);
-    // Dashboard trigger reasons live but doesn't auto-write on-chain — the human
-    // Approve below is the on-chain action (matches the human-in-the-loop demo).
     void trigger({ dry: true });
   }, [trigger]);
 
@@ -78,7 +89,6 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
     try {
       const tx = await recordTreasuryAction();
       setApprovedTx(tx);
-      // Reflect the new on-chain action count once it lands.
       for (let i = 0; i < 12; i++) {
         await new Promise((r) => setTimeout(r, 5000));
         try {
@@ -92,7 +102,7 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
         }
       }
     } catch {
-      /* surfaced via the panel staying on Approve */
+      /* surfaced by the panel staying on Approve */
     } finally {
       setApproving(false);
     }
@@ -105,10 +115,10 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
         ? result?.routed
           ? { label: 'Recovered', tone: 'text-success', dot: 'bg-success' }
           : { label: 'Monitoring', tone: 'text-sky-400', dot: 'bg-sky-400' }
-        : { label: 'Standby', tone: 'text-muted-foreground', dot: 'bg-muted-foreground' };
+        : { label: 'Live', tone: 'text-success', dot: 'bg-success animate-pulse' };
 
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-5 px-6 py-8">
+    <main className="mx-auto flex max-w-[1400px] flex-col gap-5 px-6 py-7">
       {/* Header */}
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -117,11 +127,7 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
             Live agent operations over the on-chain treasury — real reasoning, real Casper txs.
           </p>
         </div>
-        <Button
-          onClick={onTrigger}
-          disabled={running}
-          className="bg-danger text-white hover:bg-danger/90"
-        >
+        <Button onClick={onTrigger} disabled={running} className="bg-danger text-white hover:bg-danger/90">
           {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
           {running ? 'Agents responding…' : phase === 'done' ? 'Trigger again' : 'Trigger incident'}
         </Button>
@@ -133,50 +139,86 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
 
       <LiveMarket />
 
-      <StatusStrip totalActions={totalActions} severity={severity} running={running} />
+      <StatusStrip totalActions={totalActions} severity={severity} running={running} protectedUsd={protectedUsd} />
 
-      {/* Agent network + reasoning */}
+      {/* Network + right rail */}
       <div className="grid gap-5 lg:grid-cols-3">
         <Panel
           title="Live Agent Network"
           icon={Network}
+          tone="96, 165, 250"
           className="lg:col-span-2"
           right={
-            <span className={cn('inline-flex items-center gap-1.5 text-[11px] normal-case', phaseChip.tone)}>
+            <span className={cn('inline-flex items-center gap-1.5 text-[11px]', phaseChip.tone)}>
               <span className={cn('h-1.5 w-1.5 rounded-full', phaseChip.dot)} />
               {phaseChip.label}
             </span>
           }
           bodyClassName="p-2"
         >
-          <div className="h-[360px]">
+          <div className="h-[400px]">
             <AgentGraph activeAgent={activeAgent} seenAgents={seenAgents} running={running} />
           </div>
         </Panel>
 
-        <div className="flex min-h-[420px] flex-col overflow-hidden rounded-xl border border-border bg-card-elevated/40 lg:col-span-1">
-          <ThinkingPanel
-            steps={steps}
+        <div className="flex flex-col gap-5">
+          <Panel title="AI Thinking Stream" icon={Cpu} tone="167, 139, 250" className="min-h-[220px]">
+            <ThinkingPanel steps={steps} result={result} running={running} activeAgent={activeAgent} />
+          </Panel>
+
+          <Panel title="Threat Radar" icon={Radar} tone={severity !== null && severity >= 60 ? '239, 68, 68' : '34, 197, 94'}>
+            <ThreatRadar severity={severity} running={running} />
+          </Panel>
+
+          <Panel
+            title="Transaction Feed"
+            icon={Receipt}
+            tone="56, 189, 248"
+            right={
+              totalActions !== null ? (
+                <span className="font-mono text-[11px] text-muted-foreground">{totalActions} total</span>
+              ) : undefined
+            }
+            className="max-h-[300px]"
+          >
+            <TransactionFeed steps={steps} approvedTx={approvedTx} />
+          </Panel>
+        </div>
+      </div>
+
+      {/* Timeline + recommendation */}
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Panel
+          title="Live Activity Timeline"
+          icon={Radio}
+          tone="34, 197, 94"
+          className="max-h-[360px] min-h-[220px]"
+        >
+          <EventTimeline steps={steps} running={running} />
+        </Panel>
+
+        <Panel title="Treasury Agent Recommendation" icon={Coins} tone="34, 197, 94" className="min-h-[220px]">
+          <TreasuryRecommendation
             result={result}
-            running={running}
-            activeAgent={activeAgent}
             onApprove={onApprove}
             approving={approving}
             approvedTx={approvedTx}
           />
-        </div>
+        </Panel>
       </div>
 
-      {/* Timeline */}
-      <div className="flex max-h-[340px] min-h-[200px] flex-col overflow-hidden rounded-xl border border-border bg-card-elevated/40">
-        <EventTimeline steps={steps} running={running} />
-      </div>
+      <StatusBar running={running} />
 
-      <footer className="text-[11px] text-muted-foreground">
-        Trigger runs a stress drill (a simulated USDC depeg) through the real agents — live market data
-        over x402, real reasoning — and the on-chain write happens when you Approve. Every hash links to
-        cspr.live. Live prices from CoinGecko; the depeg is a drill, everything else is real.
-      </footer>
+      <motion.footer
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="text-[11px] text-muted-foreground"
+      >
+        Trigger runs a stress drill (a simulated USDC depeg) through the real agents — live market data over x402,
+        real reasoning — and the on-chain write happens when you Approve. Every hash links to cspr.live. Live prices
+        from CoinGecko; the depeg is a drill, everything else is real.
+      </motion.footer>
     </main>
   );
 }

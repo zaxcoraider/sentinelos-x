@@ -4,21 +4,22 @@
 
 :root {
   /* Mission Control palette */
-  --background: 240 6% 4%;        /* #09090B */
+  --background: 240 10% 3.5%;      /* #08080B — deeper, richer black */
   --foreground: 210 20% 98%;
   --card: 222 32% 8%;             /* slate, near #0e1420 */
   --card-elevated: 222 40% 11%;   /* #111827 */
   --card-foreground: 210 20% 98%;
   --muted: 222 20% 15%;
-  --muted-foreground: 220 12% 58%;
-  --border: 222 18% 16%;
+  --muted-foreground: 220 12% 60%;
+  --border: 222 18% 17%;
   --input: 222 18% 18%;
   --ring: 217 91% 60%;
-  --primary: 217 91% 55%;         /* #2563EB */
-  --success: 142 71% 45%;         /* #22C55E */
-  --warning: 38 92% 50%;          /* #F59E0B */
-  --danger: 0 84% 60%;            /* #EF4444 */
-  --ai: 258 90% 66%;              /* #8B5CF6 */
+  --primary: 217 91% 60%;         /* #2563EB brighter */
+  --success: 142 71% 48%;         /* #22C55E */
+  --warning: 38 95% 55%;          /* #F59E0B brighter */
+  --danger: 0 84% 62%;            /* #EF4444 */
+  --ai: 258 90% 68%;              /* #8B5CF6 */
+  --cyan: 190 95% 55%;            /* accent for oracle/data */
   --radius: 0.75rem;
 }
 
@@ -29,15 +30,82 @@
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
-  /* Ops-console backdrop: faint grid + top vignette */
-  background-image:
-    linear-gradient(hsl(var(--border) / 0.25) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--border) / 0.25) 1px, transparent 1px),
-    radial-gradient(70% 55% at 50% -5%, hsl(217 60% 16% / 0.45), transparent 70%);
-  background-size: 44px 44px, 44px 44px, 100% 100%;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
+
+/* Ops-console backdrop: faint grid + layered aurora glows.
+   The animated particle field lives in <AmbientBackground/> on top of this. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(hsl(var(--border) / 0.20) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border) / 0.20) 1px, transparent 1px);
+  background-size: 46px 46px, 46px 46px;
+  mask-image: radial-gradient(120% 90% at 50% 0%, #000 45%, transparent 100%);
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(60% 45% at 15% 0%, hsl(217 80% 22% / 0.35), transparent 60%),
+    radial-gradient(55% 45% at 85% 5%, hsl(258 80% 30% / 0.28), transparent 60%),
+    radial-gradient(70% 60% at 50% 110%, hsl(190 80% 22% / 0.18), transparent 70%);
+  animation: aurora 18s ease-in-out infinite alternate;
+}
+
+@keyframes aurora {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(0, -1.5%, 0) scale(1.06);
+    opacity: 1;
+  }
+}
+
+/* ---- Panel / card chrome ---------------------------------------------- */
+.mc-panel {
+  position: relative;
+  border-radius: 0.85rem;
+  border: 1px solid hsl(var(--border));
+  background:
+    linear-gradient(180deg, hsl(222 40% 12% / 0.75), hsl(222 40% 8% / 0.55));
+  backdrop-filter: blur(8px);
+  box-shadow:
+    0 1px 0 0 hsl(0 0% 100% / 0.04) inset,
+    0 18px 40px -24px hsl(240 60% 2% / 0.9);
+}
+/* thin top highlight line so panels read as glass, not flat fills */
+.mc-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.12), transparent);
+}
+
+.mc-card-hover {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s, border-color 0.25s;
+}
+.mc-card-hover:hover {
+  transform: translateY(-3px);
+  border-color: hsl(var(--border) / 1.6);
+  box-shadow:
+    0 1px 0 0 hsl(0 0% 100% / 0.06) inset,
+    0 24px 50px -22px hsl(240 60% 2% / 0.95);
+}
+
+/* ---- Motion primitives ------------------------------------------------ */
 
 /* Marching-ants edge for the live agent graph */
 @keyframes mc-dash {
@@ -64,6 +132,83 @@ body {
   animation: mc-pulse-fade 1.4s ease-in-out infinite;
 }
 
+/* Gentle vertical float for idle brand / hero elements */
+@keyframes mc-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+.mc-float {
+  animation: mc-float 5s ease-in-out infinite;
+}
+
+/* Sweeping conic line for the threat radar */
+@keyframes mc-radar-sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.mc-radar-sweep {
+  animation: mc-radar-sweep 4s linear infinite;
+  transform-origin: center;
+}
+
+/* Shimmer for progress bars / confidence meters */
+@keyframes mc-shimmer {
+  0% {
+    background-position: -150% 0;
+  }
+  100% {
+    background-position: 250% 0;
+  }
+}
+.mc-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    hsl(0 0% 100% / 0.35),
+    transparent
+  );
+  background-size: 40% 100%;
+  background-repeat: no-repeat;
+  animation: mc-shimmer 2.2s ease-in-out infinite;
+}
+
+/* Slow rotation for the hub rings */
+@keyframes mc-spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.mc-spin-slow {
+  animation: mc-spin-slow 24s linear infinite;
+  transform-origin: center;
+}
+.mc-spin-slow-rev {
+  animation: mc-spin-slow 32s linear infinite reverse;
+  transform-origin: center;
+}
+
+/* Soft breathing glow (drop-shadow) for live icons */
+@keyframes mc-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+.mc-breathe {
+  animation: mc-breathe 3.4s ease-in-out infinite;
+}
+
 /* Thin scrollbars inside panels */
 .mc-scroll::-webkit-scrollbar {
   width: 6px;
@@ -72,4 +217,16 @@ body {
 .mc-scroll::-webkit-scrollbar-thumb {
   background: hsl(var(--border));
   border-radius: 9999px;
+}
+.mc-scroll::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
