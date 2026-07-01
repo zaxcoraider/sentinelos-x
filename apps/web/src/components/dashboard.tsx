@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Loader2, ShieldCheck, Activity, RefreshCw } from 'lucide-react';
+import { ArrowUpRight, Loader2, ShieldCheck, Activity, RefreshCw, Zap } from 'lucide-react';
 import type { TreasuryState } from '@sentinelos/casper';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -92,9 +92,18 @@ export function Dashboard({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
-          <span className="h-2 w-2 rounded-full bg-emerald-400" />
-          casper-test · live
+        <div className="flex items-center gap-2">
+          <a
+            href="/crisis"
+            className="inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/5 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10"
+          >
+            <Zap className="h-3.5 w-3.5" />
+            Crisis Response
+          </a>
+          <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            casper-test · live
+          </div>
         </div>
       </header>
 

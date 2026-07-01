@@ -12,6 +12,7 @@ const icon: Record<TraceStep['agent'], string> = {
   Risk: '🛡',
   Commander: '🧭',
   Treasury: '💰',
+  Governance: '🏛',
 };
 
 async function main() {
@@ -33,10 +34,14 @@ async function main() {
     if (result.x402.explorerUrl) console.log(`           settlement: ${result.x402.explorerUrl}`);
   }
   if (result.decision) console.log(`action   : ${result.decision.action} (${result.decision.confidence}%)`);
+  if (result.governance) console.log(`proposal : ${result.governance.title} (${result.governance.quorumPercent}% quorum)`);
   if (result.tx) {
-    console.log(`\n✅ On-chain: ${result.tx.explorerUrl}`);
+    console.log(`\n✅ Treasury on-chain: ${result.tx.explorerUrl}`);
   } else if (live && result.routed) {
-    console.log('\n(no tx returned)');
+    console.log('\n(no treasury tx returned)');
+  }
+  if (result.governanceTx) {
+    console.log(`✅ Governance on-chain: ${result.governanceTx.explorerUrl}`);
   }
 }
 

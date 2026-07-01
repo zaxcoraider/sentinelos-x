@@ -27,8 +27,9 @@ coverage/
 *.swp
 *~
 
-# Local session notes (not for repo)
+# Local session notes / planning (not for repo)
 DEVLOG.md
+SENTINELOS_MASTERPLAN.md
 
 # OS
 .DS_Store

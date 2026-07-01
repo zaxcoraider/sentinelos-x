@@ -3,6 +3,7 @@ import type { MarketEvent, PipelineResult, TraceStep } from './types.js';
 import { assessRisk } from './agents/risk.js';
 import { route } from './agents/commander.js';
 import { decideTreasury } from './agents/treasury.js';
+import { draftProposal } from './agents/governance.js';
 import { fetchPremiumData, type VolatilityData, type X402Payment } from './x402/client.js';
 import { X402_ENABLED } from './config.js';
 
@@ -50,7 +51,17 @@ export async function runPipeline(
   });
 
   if (!routing.route) {
-    return { event, severity: risk.severity, routed: false, decision: null, x402: null, tx: null, trace };
+    return {
+      event,
+      severity: risk.severity,
+      routed: false,
+      decision: null,
+      x402: null,
+      tx: null,
+      governance: null,
+      governanceTx: null,
+      trace,
+    };
   }
 
   // 3. Treasury buys premium data via x402 (best-effort — the loop proceeds
@@ -90,9 +101,9 @@ export async function runPipeline(
 
   // 5. Record the decision on-chain.
   let tx = null;
+  const protectedUsd = Math.max(0, Math.round(decision.expectedSavingsUsd));
   if (live) {
-    const value = Math.max(0, Math.round(decision.expectedSavingsUsd));
-    const result = await recordAction('treasury', decision.action, Math.round(risk.severity), value);
+    const result = await recordAction('treasury', decision.action, Math.round(risk.severity), protectedUsd);
     tx = result;
     push({
       agent: 'Treasury',
@@ -102,5 +113,27 @@ export async function runPipeline(
     });
   }
 
-  return { event, severity: risk.severity, routed: true, decision, x402, tx, trace };
+  // 6. Governance Agent — draft an emergency proposal ratifying the response,
+  //    then anchor it on-chain so it's a verifiable artifact (not just a doc).
+  const governance = await draftProposal(event, risk, decision);
+  push({
+    agent: 'Governance',
+    summary: `Drafted "${governance.title}" — ${governance.action}, ${governance.quorumPercent}% quorum, ${governance.votingWindowHours}h window`,
+    detail: { ...governance },
+    at: now(),
+  });
+
+  let governanceTx = null;
+  if (live) {
+    const result = await recordAction('governance', 'PROPOSAL', Math.round(risk.severity), protectedUsd);
+    governanceTx = result;
+    push({
+      agent: 'Governance',
+      summary: `Proposal anchored on Casper — ${result.txHash}`,
+      detail: { txHash: result.txHash, explorerUrl: result.explorerUrl },
+      at: now(),
+    });
+  }
+
+  return { event, severity: risk.severity, routed: true, decision, x402, tx, governance, governanceTx, trace };
 }
