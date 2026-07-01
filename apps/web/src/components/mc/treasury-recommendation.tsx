@@ -5,6 +5,7 @@ import { Loader2, ShieldCheck, ArrowUpRight, Check, X, Coins } from 'lucide-reac
 import type { PipelineResult } from '@sentinelos/agents';
 import { Button } from '@/components/ui/button';
 import { Donut, MeterBar } from './primitives';
+import { Magnetic } from './magnetic';
 import { shortHash } from '@/lib/utils';
 
 interface TxInfo {
@@ -97,14 +98,22 @@ export function TreasuryRecommendation({
           </a>
         ) : (
           <div className="mt-4 flex items-center gap-2">
-            <Button onClick={onApprove} disabled={approving} className="flex-1 bg-success text-background hover:bg-success/90">
-              {approving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-              {approving ? 'Recording…' : 'Approve'}
-            </Button>
-            <Button variant="outline" disabled={approving} className="flex-1 hover:border-danger/40 hover:text-danger">
-              <X className="h-4 w-4" />
-              Reject
-            </Button>
+            <Magnetic className="flex-1">
+              <Button
+                onClick={onApprove}
+                disabled={approving}
+                className="w-full bg-success text-background hover:bg-success/90"
+              >
+                {approving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                {approving ? 'Recording…' : 'Approve'}
+              </Button>
+            </Magnetic>
+            <Magnetic className="flex-1">
+              <Button variant="outline" disabled={approving} className="w-full hover:border-danger/40 hover:text-danger">
+                <X className="h-4 w-4" />
+                Reject
+              </Button>
+            </Magnetic>
           </div>
         )}
       </div>

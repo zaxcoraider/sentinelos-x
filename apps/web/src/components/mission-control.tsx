@@ -16,6 +16,7 @@ import { ThreatRadar } from '@/components/mc/threat-radar';
 import { TransactionFeed } from '@/components/mc/transaction-feed';
 import { TreasuryRecommendation } from '@/components/mc/treasury-recommendation';
 import { StatusBar } from '@/components/mc/status-bar';
+import { Magnetic } from '@/components/mc/magnetic';
 import { cn } from '@/lib/utils';
 
 interface TxInfo {
@@ -127,10 +128,12 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
             Live agent operations over the on-chain treasury — real reasoning, real Casper txs.
           </p>
         </div>
-        <Button onClick={onTrigger} disabled={running} className="bg-danger text-white hover:bg-danger/90">
-          {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
-          {running ? 'Agents responding…' : phase === 'done' ? 'Trigger again' : 'Trigger incident'}
-        </Button>
+        <Magnetic>
+          <Button onClick={onTrigger} disabled={running} className="bg-danger text-white hover:bg-danger/90">
+            {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+            {running ? 'Agents responding…' : phase === 'done' ? 'Trigger again' : 'Trigger incident'}
+          </Button>
+        </Magnetic>
       </header>
 
       {error && (
