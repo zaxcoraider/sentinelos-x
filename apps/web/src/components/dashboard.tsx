@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Loader2, ShieldCheck, Activity, RefreshCw, Zap } from 'lucide-react';
+import { ArrowUpRight, Loader2, Activity, RefreshCw } from 'lucide-react';
 import type { TreasuryState } from '@sentinelos/casper';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,33 +78,13 @@ export function Dashboard({
   const severity = state?.lastSeverity ?? null;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-6 py-12">
-      {/* Status bar */}
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-foreground text-background">
-            <ShieldCheck className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight">SentinelOS X</h1>
-            <p className="text-xs text-muted-foreground">
-              TreasuryGuard · Casper Testnet
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <a
-            href="/crisis"
-            className="inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/5 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10"
-          >
-            <Zap className="h-3.5 w-3.5" />
-            Crisis Response
-          </a>
-          <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
-            <span className="h-2 w-2 rounded-full bg-emerald-400" />
-            casper-test · live
-          </div>
-        </div>
+    <main className="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-10">
+      {/* Page title */}
+      <header>
+        <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Live TreasuryGuard state on Casper Testnet — no mock data.
+        </p>
       </header>
 
       {error && (

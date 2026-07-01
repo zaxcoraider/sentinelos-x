@@ -12,7 +12,6 @@ import {
   Zap,
   CheckCircle2,
   Activity,
-  ArrowLeft,
   CreditCard,
 } from 'lucide-react';
 import type {
@@ -129,27 +128,18 @@ export function Crisis() {
   }, [dry]);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-8 px-6 py-12">
-      {/* Header */}
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/10 text-red-400 ring-1 ring-red-500/30">
-            <Zap className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight">Crisis Response</h1>
-            <p className="text-xs text-muted-foreground">
-              Autonomous depeg → detect · pay · decide · execute · recover
-            </p>
-          </div>
+    <main className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-10">
+      {/* Page title */}
+      <header className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/10 text-red-400 ring-1 ring-red-500/30">
+          <Zap className="h-5 w-5" />
         </div>
-        <a
-          href="/"
-          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Dashboard
-        </a>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Crisis Response</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            Autonomous depeg → detect · pay · decide · execute · recover
+          </p>
+        </div>
       </header>
 
       {/* Peg health panel */}
