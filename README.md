@@ -46,14 +46,14 @@ actually happens, with the tx hashes linking out to cspr.live.
 
 ---
 
-## Screenshots
+## See it live
 
-| | |
-|---|---|
-| ![Dashboard](docs/screenshots/dashboard.png) | ![Agent Team](docs/screenshots/agent-team.png) |
-| ![Crisis Response — live agent trace](docs/screenshots/crisis-trace.png) | ![Security Center](docs/screenshots/security-center.png) |
+▶ **Live demo:** _deployed on Vercel — see the link in the repo's **About** panel (top-right)._
 
-*Dashboard · Agent Team · Crisis Response (live agent trace) · Security Center — all on live Casper Testnet state.*
+The running app is the best way to experience it: open **Mission Control**, hit **Trigger
+incident**, and watch the live agent network light up, the reasoning stream in, and the
+on-chain records land — each linking to cspr.live. Runs on **live Casper Testnet state**, no
+mock data. (Or run it locally — see [Run it yourself](#run-it-yourself).)
 
 ---
 
