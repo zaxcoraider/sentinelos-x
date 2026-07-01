@@ -38,8 +38,9 @@ new ones.
   transfer for x402 settlement). All state on the dashboard is read live from the chain.
 
 **Tech:** Rust · Odra 2.8.2 · casper-js-sdk 5.0.12 · Claude (`claude-opus-4.8`, tool-based
-structured output, via the DGrid gateway) · custom x402 HTTP-402 payments · Next.js 15 +
-Tailwind + Framer Motion.
+structured output, via the DGrid gateway) · x402 HTTP-402 payments · CoinGecko live market data
+· **Casper AI Toolkit**: official **Casper MCP server** (`.mcp.json`), **CSPR.cloud** (real
+on-chain event feed), Odra, x402 facilitator (production path) · Next.js 15 + Tailwind + Framer Motion.
 
 **Links:**
 - Repo: https://github.com/zaxcoraider/sentinelos-x

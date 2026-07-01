@@ -126,6 +126,33 @@ actually happens, with the tx hashes linking out to cspr.live.
 
 ---
 
+## Casper AI Toolkit — the sponsor stack we build on
+
+SentinelOS runs on the official [Casper AI Toolkit](https://www.casper.network/ai):
+
+- **Odra** — the `TreasuryGuard` contract (Rust → WASM), deployed to testnet.
+- **CSPR.cloud** — real-time chain data: the Security Center's on-chain activity feed reads
+  live `record_action` events via the CSPR.cloud REST API.
+- **MCP (Model Context Protocol)** — this repo wires the official **Casper MCP server**
+  (`mcp.testnet.cspr.cloud`) in [`.mcp.json`](.mcp.json), so any MCP agent (Claude Code, etc.)
+  can query and operate the TreasuryGuard contract through Casper's standardized tooling —
+  `get_account_deploys`, `get_contract`, `get_account_info`, `get_account_ft_balances`, and 40+ more.
+  Verified handshake: `CasperMcp v3.1.0`.
+- **x402** — HTTP-native micropayments. The demo settles via a real native-CSPR transfer as a
+  stand-in; the production path is the official **Casper x402 facilitator**
+  (`x402-facilitator.cspr.cloud`, sponsored txs), which we name as the next integration.
+- **AI Skills** — the signing/execution layer (`@sentinelos/casper`) mirrors the CSPR.build
+  Agent Skills model.
+
+```jsonc
+// .mcp.json — the official Casper MCP server, keyed by CSPR_CLOUD_API_KEY
+{ "mcpServers": { "casper": { "type": "http",
+  "url": "https://mcp.testnet.cspr.cloud/mcp",
+  "headers": { "X-CSPR-Cloud-Api-Key": "${CSPR_CLOUD_API_KEY}" } } } }
+```
+
+---
+
 ## Repository layout
 
 ```
