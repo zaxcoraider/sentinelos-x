@@ -17,16 +17,21 @@ Built for the **Casper Agentic Buildathon 2026** (Agentic AI track) on **Casper 
 
 ## The autonomous crisis loop (real, end-to-end)
 
-A single 7% USDx depeg, handled with zero human keystrokes — captured from a live run:
+A **stress drill** — a simulated 7% USDC depeg on the **real, live-monitored** asset — handled
+with zero human keystrokes, captured from a live run:
 
 ```
 🛡  Risk        → severity 82/100 (Claude): "severe deviation, collateral stress"
 🧭  Commander   → 82 > 60 threshold → wake Treasury
-💰  Treasury    → buys premium volatility over x402 (real CSPR settlement)
-                → decides REBALANCE (88% confidence, ~$4.2M protected)
+💰  Treasury    → pays for REAL market data over x402 (live CoinGecko vol + peg,
+                  real CSPR settlement) → decides REBALANCE (88%, ~$4.2M protected)
                 → records the action on-chain (TreasuryGuard)
 🏛  Governance  → drafts an emergency proposal, anchors it on-chain for the DAO
 ```
+
+> **Honesty:** the USDC price/volatility the agents read is **real and live** (CoinGecko);
+> the depeg shock is a labeled drill; the reasoning, x402 settlement, and on-chain records are
+> all real. We never present a simulated event as a real-world one.
 
 **On-chain proof (Casper Testnet):**
 
@@ -100,7 +105,8 @@ actually happens, with the tx hashes linking out to cspr.live.
   (`@anthropic-ai/sdk`, tool-based structured output) reached through the **DGrid** gateway.
   The orchestrator is a deterministic graph (Risk → Commander gate → Treasury → Governance).
 - **x402** — `services/premium-data`: an HTTP **402 Payment Required** feed; the client pays
-  with a real native CSPR transfer, then unlocks the volatility data. The x402 fetch is
+  with a real native CSPR transfer, then unlocks **real live market data** (CoinGecko ETH
+  volatility + USDC peg, computed server-side). The x402 fetch is
   best-effort — the loop still proceeds if the feed is down, so **qualification never depends
   on x402**.
 - **Chain I/O** — `packages/casper`: `casper-js-sdk` 5.0.12 for `recordAction`, `readState`,
@@ -115,6 +121,7 @@ actually happens, with the tx hashes linking out to cspr.live.
 - **Agents:** Claude via `@anthropic-ai/sdk` (model `claude-opus-4.8`), tool-based structured
   output, through the **DGrid** Anthropic-compatible gateway
 - **Payments:** custom HTTP 402 (x402) + native CSPR settlement
+- **Market data:** CoinGecko (free, live) — real ETH volatility + USDC peg, delivered over x402
 - **Frontend:** Next.js 15.5 (App Router) · Tailwind v3 · shadcn-style UI · Framer Motion
 
 ---
@@ -126,7 +133,7 @@ sentinelos-x/
 ├── contracts/treasury_guard/   Odra contract (Rust) — DEPLOYED to testnet
 ├── packages/casper/            TS chain layer (recordAction · readState · transferCspr)
 ├── packages/agents/            Commander/Risk/Treasury/Governance + x402 client + orchestrator
-├── services/premium-data/      x402-gated volatility feed (HTTP 402)
+├── services/premium-data/      x402-gated live market feed (HTTP 402 · CoinGecko)
 └── apps/web/                   Next.js dashboard (Dashboard · Crisis · Agent Team · Security)
 ```
 

@@ -23,10 +23,13 @@ new ones.
 
 **What it does:**
 - Four live AI agents run an autonomous crisis loop over an on-chain treasury.
-- Risk scores a market event (0–100); Commander routes on a threshold; Treasury buys premium
-  volatility data over **x402** (a real native CSPR settlement), decides a protective action,
-  and records it on-chain; Governance drafts an emergency proposal and anchors it on-chain.
-- A Next.js dashboard streams the whole trace live and links every action to cspr.live.
+- Risk scores a market event (0–100); Commander routes on a threshold; Treasury pays for
+  **real live market data** (CoinGecko ETH vol + USDC peg) over **x402** (a real native CSPR
+  settlement), decides a protective action, and records it on-chain; Governance drafts an
+  emergency proposal and anchors it on-chain.
+- A Next.js "Mission Control" dashboard streams the whole trace live — an animated agent
+  network, reasoning panel, and event timeline — and links every action to cspr.live.
+- The monitored asset is real USDC (live peg); the depeg is a clearly-labeled stress drill.
 
 **How Casper 2.0 is used:**
 - An Odra (Rust → WASM) `TreasuryGuard` contract deployed to Casper Testnet, with a
@@ -59,23 +62,24 @@ multi-protocol coverage.
 > Screen-record the dashboard at `npm run dev`. Have the premium-data feed running so the
 > live x402 leg fires. Keep a cspr.live tab ready.
 
-**0:00–0:20 — The hook (Dashboard)**
+**0:00–0:25 — The hook (Mission Control)**
 > "Most Web3 AI answers questions. SentinelOS *runs the protocol*."
-Show the dashboard: Protocol Status Operational, Agents Online 4/12, Threat Level, on-chain
-action count. "Four AI agents are live and acting on a real treasury on Casper."
+Show Mission Control: the live agent network, Protocol Health 100%, Agents 4/12, real on-chain
+tx count, and the **Live Market bar monitoring real USDC ($0.9996, peg holding · CoinGecko)**.
+"Four AI agents, live, watching a real treasury on Casper — with real market data."
 
-**0:20–0:45 — The team (Agent Team)**
+**0:25–0:50 — The team (Agent Team)**
 Click **Agent Team**. "Commander, Risk, Treasury, Governance — live, acting on-chain today.
 Eight more ship in v1. We never fake it: green means real, grey means roadmap."
 
-**0:45–2:05 — The crisis (Crisis Response) — the wow moment**
-Click **Crisis Response** → **Simulate USDx depeg**. Narrate as the trace streams in:
-> "A 7% depeg hits. **Risk** scores it 82 out of 100. **Commander** sees it cross the
-> threshold and wakes Treasury. **Treasury** pays for premium volatility data over **x402** —
-> that's a real CSPR settlement, here's the hash — then decides to REBALANCE, protecting about
-> $4.2M, and records it on-chain. **Governance** drafts an emergency proposal and anchors it
-> on-chain for the DAO."
-The peg meter recovers $1 → $0.93 → recovered. "All of that, in seconds, no human keystrokes."
+**0:50–2:05 — The crisis — the wow moment**
+On Mission Control, click **Trigger incident** (a USDC depeg stress drill). Narrate as the
+agent graph lights up and the trace streams:
+> "A 7% USDC depeg drill hits. **Risk** scores it 82 out of 100. **Commander** routes it and
+> wakes Treasury. **Treasury** pays for **real market data over x402** — a real CSPR settlement,
+> here's the hash — then recommends REBALANCE, ~$4.2M protected. I **approve** — that fires the
+> real on-chain record. **Governance** reaches consensus on an emergency proposal."
+Health recovers, threat returns to LOW. "All of that, in seconds — a human only approves."
 
 **2:05–2:35 — Proof (cspr.live)**
 Click a tx hash. Show the transaction on cspr.live. "Every action is a verifiable Casper
