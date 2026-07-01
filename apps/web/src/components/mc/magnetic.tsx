@@ -3,6 +3,9 @@
 import { useEffect, useRef } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
+// A magnetic element must never move between mousedown and mouseup, or the
+// browser cancels the click. We freeze the offset while the pointer is pressed.
+
 /**
  * Wraps an element so it feels magnetic: while the cursor is within `radius` of
  * the element it drifts toward the pointer (capped at `maxShift`px), then springs
@@ -32,8 +35,10 @@ export function Magnetic({
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!fine || reduce) return;
 
+    let pressed = false;
     const clamp = (v: number) => Math.max(-maxShift, Math.min(maxShift, v));
     const onMove = (e: MouseEvent) => {
+      if (pressed) return; // hold still through a click so it always registers
       const el = ref.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
@@ -50,9 +55,21 @@ export function Magnetic({
         y.set(0);
       }
     };
+    const onDown = () => {
+      pressed = true;
+    };
+    const onUp = () => {
+      pressed = false;
+    };
 
     window.addEventListener('mousemove', onMove);
-    return () => window.removeEventListener('mousemove', onMove);
+    window.addEventListener('mousedown', onDown);
+    window.addEventListener('mouseup', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mousedown', onDown);
+      window.removeEventListener('mouseup', onUp);
+    };
   }, [strength, radius, maxShift, x, y]);
 
   return (

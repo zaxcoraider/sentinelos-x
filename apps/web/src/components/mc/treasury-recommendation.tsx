@@ -16,26 +16,36 @@ interface TxInfo {
 export function TreasuryRecommendation({
   result,
   onApprove,
+  onReject,
   approving,
   approvedTx,
+  approveError,
+  dismissed,
 }: {
   result: PipelineResult | null;
   onApprove: () => void;
+  onReject: () => void;
   approving: boolean;
   approvedTx: TxInfo | null;
+  approveError: string | null;
+  dismissed: boolean;
 }) {
   const decision = result?.decision ?? null;
   const gov = result?.governance ?? null;
 
-  if (!decision) {
+  if (!decision || dismissed) {
     return (
       <div className="flex h-full min-h-[200px] flex-col items-center justify-center gap-2 p-6 text-center">
         <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-success/10 text-success">
           <Coins className="h-5 w-5" />
         </span>
-        <div className="text-sm font-medium text-foreground/80">No active recommendation</div>
+        <div className="text-sm font-medium text-foreground/80">
+          {dismissed ? 'Recommendation rejected' : 'No active recommendation'}
+        </div>
         <p className="max-w-xs text-xs text-muted-foreground">
-          Trigger an incident — the Treasury Agent drafts a protective action here for you to approve on-chain.
+          {dismissed
+            ? 'No on-chain action was recorded. Trigger the incident again to draft a fresh recommendation.'
+            : 'Trigger an incident — the Treasury Agent drafts a protective action here for you to approve on-chain.'}
         </p>
       </div>
     );
@@ -109,11 +119,22 @@ export function TreasuryRecommendation({
               </Button>
             </Magnetic>
             <Magnetic className="flex-1">
-              <Button variant="outline" disabled={approving} className="w-full hover:border-danger/40 hover:text-danger">
+              <Button
+                variant="outline"
+                onClick={onReject}
+                disabled={approving}
+                className="w-full hover:border-danger/40 hover:text-danger"
+              >
                 <X className="h-4 w-4" />
                 Reject
               </Button>
             </Magnetic>
+          </div>
+        )}
+
+        {approveError && (
+          <div className="mt-3 rounded-md border border-danger/30 bg-danger/5 px-3 py-2 text-xs text-danger">
+            Approve failed: {approveError}
           </div>
         )}
       </div>

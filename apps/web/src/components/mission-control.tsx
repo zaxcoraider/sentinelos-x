@@ -71,6 +71,8 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
   const [totalActions, setTotalActions] = useState<number | null>(initialTotalActions);
   const [approving, setApproving] = useState(false);
   const [approvedTx, setApprovedTx] = useState<TxInfo | null>(null);
+  const [approveError, setApproveError] = useState<string | null>(null);
+  const [rejected, setRejected] = useState(false);
 
   const severity = useMemo(() => {
     if (running) return severityFromSteps(steps);
@@ -82,11 +84,19 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
 
   const onTrigger = useCallback(() => {
     setApprovedTx(null);
+    setApproveError(null);
+    setRejected(false);
     void trigger({ dry: true });
   }, [trigger]);
 
+  const onReject = useCallback(() => {
+    setRejected(true);
+    setApproveError(null);
+  }, []);
+
   const onApprove = useCallback(async () => {
     setApproving(true);
+    setApproveError(null);
     try {
       const tx = await recordTreasuryAction();
       setApprovedTx(tx);
@@ -99,11 +109,11 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
             break;
           }
         } catch {
-          /* keep polling */
+          /* keep polling — the write is submitted; execution confirms shortly */
         }
       }
-    } catch {
-      /* surfaced by the panel staying on Approve */
+    } catch (e) {
+      setApproveError(e instanceof Error ? e.message : 'Transaction failed to submit');
     } finally {
       setApproving(false);
     }
@@ -204,8 +214,11 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
           <TreasuryRecommendation
             result={result}
             onApprove={onApprove}
+            onReject={onReject}
             approving={approving}
             approvedTx={approvedTx}
+            approveError={approveError}
+            dismissed={rejected}
           />
         </Panel>
       </div>
