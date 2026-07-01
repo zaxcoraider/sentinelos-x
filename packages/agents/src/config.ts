@@ -8,8 +8,27 @@ export const REPO_ROOT = resolve(__dirname, '../../..');
 
 loadEnv({ path: resolve(REPO_ROOT, '.env') });
 
-/** Default to the latest, most capable Claude model. Overridable via AGENT_MODEL. */
+/**
+ * Default to the latest, most capable Claude model. Overridable via AGENT_MODEL.
+ * Through a gateway the id is namespaced, e.g. `anthropic/claude-opus-4.8` on DGrid.
+ */
 export const AGENT_MODEL = process.env.AGENT_MODEL ?? 'claude-opus-4-8';
+
+/**
+ * Optional base URL for an Anthropic-compatible gateway (e.g. DGrid:
+ * https://api.dgrid.ai). When set, the agents call Claude through it instead of
+ * api.anthropic.com. Also honours the SDK-standard ANTHROPIC_BASE_URL.
+ */
+export const AGENT_BASE_URL = process.env.AGENT_BASE_URL ?? process.env.ANTHROPIC_BASE_URL ?? '';
+
+/**
+ * How to present the key: `x-api-key` (native Anthropic) or `bearer`
+ * (Authorization: Bearer — what OpenAI-style gateways like DGrid expect).
+ * Defaults to bearer whenever a gateway base URL is set.
+ */
+export const AGENT_AUTH_STYLE = (process.env.AGENT_AUTH_STYLE ?? (AGENT_BASE_URL ? 'bearer' : 'x-api-key')) as
+  | 'bearer'
+  | 'x-api-key';
 
 /**
  * Adaptive thinking sharpens the agents' judgement but adds latency. On by
