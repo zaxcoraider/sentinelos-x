@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Loader2, Activity, RefreshCw } from 'lucide-react';
+import { ArrowUpRight, Loader2, Activity, RefreshCw, CheckCircle2, Bot } from 'lucide-react';
 import type { TreasuryState } from '@sentinelos/casper';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -94,10 +94,46 @@ export function Dashboard({
       )}
 
       {/* Stat grid */}
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle>Total Actions</CardTitle>
+            <CardTitle>Protocol Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2 text-2xl font-semibold text-emerald-400">
+              <CheckCircle2 className="h-5 w-5" />
+              Operational
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">TreasuryGuard live on-chain</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Agents Online</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-baseline gap-1.5">
+              <Bot className="h-5 w-5 self-center text-muted-foreground" />
+              <span className="font-mono text-3xl font-semibold tabular-nums">4</span>
+              <span className="text-sm text-muted-foreground">/ 12</span>
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">Commander · Risk · Treasury · Governance</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Threat Level</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RiskIndicator severity={severity} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>On-chain Actions</CardTitle>
           </CardHeader>
           <CardContent>
             <AnimatePresence mode="popLayout">
@@ -111,6 +147,7 @@ export function Dashboard({
                 {state ? state.totalActions : '—'}
               </motion.div>
             </AnimatePresence>
+            <div className="mt-1 text-xs text-muted-foreground">autonomous txs recorded</div>
           </CardContent>
         </Card>
 
@@ -128,10 +165,14 @@ export function Dashboard({
 
         <Card>
           <CardHeader>
-            <CardTitle>Risk Indicator</CardTitle>
+            <CardTitle>Network</CardTitle>
           </CardHeader>
           <CardContent>
-            <RiskIndicator severity={severity} />
+            <div className="flex items-center gap-2 text-2xl font-semibold">
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+              casper-test
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">Casper 2.0 · testnet</div>
           </CardContent>
         </Card>
       </section>

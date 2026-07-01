@@ -25,10 +25,10 @@ const LIVE_NAV: NavItem[] = [
   { label: 'Dashboard', href: '/', icon: LayoutDashboard },
   { label: 'Crisis Response', href: '/crisis', icon: Zap },
   { label: 'Agent Team', href: '/agents', icon: Bot },
+  { label: 'Security Center', href: '/security', icon: ShieldAlert },
 ];
 
 const ROADMAP_NAV: NavItem[] = [
-  { label: 'Security Center', href: '#', icon: ShieldAlert, roadmap: true },
   { label: 'Analytics', href: '#', icon: BarChart3, roadmap: true },
   { label: 'Marketplace', href: '#', icon: Store, roadmap: true },
   { label: 'Settings', href: '#', icon: Settings, roadmap: true },
