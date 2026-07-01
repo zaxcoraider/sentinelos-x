@@ -3,15 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --background: 240 10% 4%;
-  --foreground: 0 0% 98%;
-  --card: 240 8% 6%;
-  --card-foreground: 0 0% 98%;
-  --muted: 240 5% 12%;
-  --muted-foreground: 240 5% 60%;
-  --border: 240 6% 16%;
-  --input: 240 6% 16%;
-  --ring: 240 5% 40%;
+  /* Mission Control palette */
+  --background: 240 6% 4%;        /* #09090B */
+  --foreground: 210 20% 98%;
+  --card: 222 32% 8%;             /* slate, near #0e1420 */
+  --card-elevated: 222 40% 11%;   /* #111827 */
+  --card-foreground: 210 20% 98%;
+  --muted: 222 20% 15%;
+  --muted-foreground: 220 12% 58%;
+  --border: 222 18% 16%;
+  --input: 222 18% 18%;
+  --ring: 217 91% 60%;
+  --primary: 217 91% 55%;         /* #2563EB */
+  --success: 142 71% 45%;         /* #22C55E */
+  --warning: 38 92% 50%;          /* #F59E0B */
+  --danger: 0 84% 60%;            /* #EF4444 */
+  --ai: 258 90% 66%;              /* #8B5CF6 */
   --radius: 0.75rem;
 }
 
@@ -22,8 +29,47 @@
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
+  /* Ops-console backdrop: faint grid + top vignette */
   background-image:
-    radial-gradient(60% 50% at 50% 0%, hsl(240 30% 14% / 0.5), transparent 70%);
+    linear-gradient(hsl(var(--border) / 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border) / 0.25) 1px, transparent 1px),
+    radial-gradient(70% 55% at 50% -5%, hsl(217 60% 16% / 0.45), transparent 70%);
+  background-size: 44px 44px, 44px 44px, 100% 100%;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Marching-ants edge for the live agent graph */
+@keyframes mc-dash {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+.mc-edge-active {
+  stroke-dasharray: 4 6;
+  animation: mc-dash 0.7s linear infinite;
+}
+
+/* Slow drift for the traveling message pulse */
+@keyframes mc-pulse-fade {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.mc-live-dot {
+  animation: mc-pulse-fade 1.4s ease-in-out infinite;
+}
+
+/* Thin scrollbars inside panels */
+.mc-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.mc-scroll::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 9999px;
 }
