@@ -26,7 +26,7 @@ import { cn, shortHash } from '@/lib/utils';
 
 type Phase = 'idle' | 'running' | 'done' | 'error';
 
-const DEFAULT_EVENT: MarketEvent = { type: 'DEPEG', asset: 'USDx', deviation: 0.07 };
+const DEFAULT_EVENT: MarketEvent = { type: 'DEPEG', asset: 'USDC', deviation: 0.07 };
 
 const AGENT_META: Record<AgentRole, { icon: typeof ShieldAlert; color: string; ring: string; label: string }> = {
   Risk: { icon: ShieldAlert, color: 'text-amber-400', ring: 'ring-amber-500/30', label: 'Risk Agent' },
@@ -147,7 +147,7 @@ export function Crisis() {
         <CardContent className="flex flex-col gap-5 p-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">USDx peg</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">USDC peg</div>
               <div className="mt-1 flex items-baseline gap-2">
                 <AnimatePresence mode="popLayout">
                   <motion.span
@@ -209,7 +209,7 @@ export function Crisis() {
 
           <div className="flex flex-wrap items-center justify-between gap-4">
             <p className="max-w-sm text-sm text-muted-foreground">
-              Injects a {(deviation * 100).toFixed(0)}% USDx depeg and turns the live agent team loose:
+              Injects a {(deviation * 100).toFixed(0)}% USDC depeg and turns the live agent team loose:
               Risk scores it, Commander routes, Treasury buys premium data over{' '}
               <span className="font-mono text-foreground">x402</span> and acts, Governance drafts an
               emergency proposal — all anchored on Casper.
@@ -217,7 +217,7 @@ export function Crisis() {
             <div className="flex flex-col items-end gap-2">
               <Button onClick={trigger} disabled={running} className="bg-red-500 text-white hover:bg-red-500/90">
                 {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
-                {running ? 'Agents responding…' : 'Simulate USDx depeg'}
+                {running ? 'Agents responding…' : 'Simulate USDC depeg'}
               </Button>
               <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
                 <input

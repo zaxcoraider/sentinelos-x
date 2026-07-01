@@ -7,8 +7,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
-/** The canonical demo scenario: a 7% USDx stablecoin depeg. */
-const DEFAULT_EVENT: MarketEvent = { type: 'DEPEG', asset: 'USDx', deviation: 0.07 };
+/** The canonical demo scenario: a stress drill — a simulated 7% USDC depeg. */
+const DEFAULT_EVENT: MarketEvent = { type: 'DEPEG', asset: 'USDC', deviation: 0.07 };
 
 /**
  * Streams the sentinel crisis pipeline as newline-delimited JSON so the UI can

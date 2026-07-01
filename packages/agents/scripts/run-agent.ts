@@ -2,8 +2,8 @@ import { runPipeline } from '../src/orchestrator.js';
 import { AGENT_MODEL, X402_ENABLED, X402_MODE } from '../src/config.js';
 import type { MarketEvent, TraceStep } from '../src/types.js';
 
-// The canonical demo scenario: a 7% stablecoin depeg.
-const event: MarketEvent = { type: 'DEPEG', asset: 'USDx', deviation: 0.07 };
+// The canonical demo scenario: a stress drill — a simulated 7% USDC depeg.
+const event: MarketEvent = { type: 'DEPEG', asset: 'USDC', deviation: 0.07 };
 
 // `--dry` skips the on-chain write (no CSPR spent); default fires a real tx.
 const live = !process.argv.includes('--dry');

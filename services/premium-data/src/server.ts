@@ -8,6 +8,7 @@ import {
   type PaymentRequirements,
   type PaymentRequiredResponse,
 } from './protocol.js';
+import { getMarketAnalytics } from './market.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // repo root is three levels up from services/premium-data/src
@@ -34,18 +35,49 @@ function paymentRequirements(): PaymentRequirements {
   };
 }
 
-/** Mock premium analytics — elevated vol consistent with a stablecoin depeg. */
-function volatilityPayload() {
+const STABLE_LABEL: Record<string, string> = { 'usd-coin': 'USDC', dai: 'DAI', tether: 'USDT' };
+const REF_LABEL: Record<string, string> = { ethereum: 'ETH', bitcoin: 'BTC' };
+
+/** Fallback analytics if CoinGecko is unreachable (x402 stays best-effort). */
+function fallbackPayload() {
   return {
-    asset: 'USDx',
+    asset: 'USDC',
     annualizedVol: 0.42,
-    realizedVol24h: 0.18,
     regime: 'STRESSED',
     depegProbability24h: 0.61,
     recommendation: 'Reduce exposure; rebalance toward hard collateral.',
-    source: 'SentinelOS Premium Feed (x402)',
+    source: 'SentinelOS analytics (live feed unavailable)',
     updatedAt: new Date().toISOString(),
   };
+}
+
+/** Real premium analytics: live CoinGecko market data delivered over x402. */
+async function volatilityPayload() {
+  try {
+    const m = await getMarketAnalytics();
+    const stableLabel = STABLE_LABEL[m.stable] ?? m.stable;
+    const refLabel = REF_LABEL[m.volReference] ?? m.volReference;
+    return {
+      asset: stableLabel,
+      annualizedVol: Number(m.annualizedVol.toFixed(4)),
+      regime: m.regime,
+      depegProbability24h: m.depegProbability24h,
+      recommendation:
+        m.regime === 'STRESSED'
+          ? 'Elevated systemic volatility — reduce exposure and rebalance toward hard collateral.'
+          : 'Volatility within normal range — maintain positions and monitor.',
+      volReference: refLabel,
+      refPriceUsd: m.refPriceUsd,
+      ref24hChange: Number(m.ref24hChange.toFixed(2)),
+      stablePriceUsd: m.stablePriceUsd,
+      stablePegDeviation: Number(m.stablePegDeviation.toFixed(5)),
+      source: `${refLabel} vol + ${stableLabel} peg · ${m.source} · x402`,
+      updatedAt: m.updatedAt,
+    };
+  } catch (err) {
+    console.log(`[market] CoinGecko fetch failed (${err instanceof Error ? err.message : 'error'}) → fallback`);
+    return fallbackPayload();
+  }
 }
 
 function json(res: ServerResponse, status: number, body: unknown, headers: Record<string, string> = {}) {
@@ -54,7 +86,7 @@ function json(res: ServerResponse, status: number, body: unknown, headers: Recor
   res.end(data);
 }
 
-function handleVolatility(req: IncomingMessage, res: ServerResponse) {
+async function handleVolatility(req: IncomingMessage, res: ServerResponse) {
   const header = req.headers['x-payment'];
 
   if (!header || typeof header !== 'string') {
@@ -89,7 +121,8 @@ function handleVolatility(req: IncomingMessage, res: ServerResponse) {
   // presented hash and log it. The hash is a real Casper tx in live mode.
   console.log(`[200] payment accepted (tx ${payment.payload.txHash}) → serving premium data`);
   const settlement = encodePayment(payment);
-  return json(res, 200, volatilityPayload(), { 'x-payment-response': settlement });
+  const payload = await volatilityPayload();
+  return json(res, 200, payload, { 'x-payment-response': settlement });
 }
 
 const server = createServer((req, res) => {

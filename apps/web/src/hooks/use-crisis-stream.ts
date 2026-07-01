@@ -5,7 +5,7 @@ import type { MarketEvent, TraceStep, PipelineResult, AgentRole } from '@sentine
 
 export type StreamPhase = 'idle' | 'running' | 'done' | 'error';
 
-export const DEFAULT_EVENT: MarketEvent = { type: 'DEPEG', asset: 'USDx', deviation: 0.07 };
+export const DEFAULT_EVENT: MarketEvent = { type: 'DEPEG', asset: 'USDC', deviation: 0.07 };
 
 export interface CrisisStream {
   phase: StreamPhase;

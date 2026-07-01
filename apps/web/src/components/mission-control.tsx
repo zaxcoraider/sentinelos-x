@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { fetchState, recordTreasuryAction } from '@/app/actions';
 import { useCrisisStream } from '@/hooks/use-crisis-stream';
 import { StatusStrip } from '@/components/mc/status-strip';
+import { LiveMarket } from '@/components/mc/live-market';
 import { AgentGraph } from '@/components/mc/agent-graph';
 import { EventTimeline } from '@/components/mc/event-timeline';
 import { ThinkingPanel } from '@/components/mc/thinking-panel';
@@ -130,6 +131,8 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
         <div className="rounded-md border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger">{error}</div>
       )}
 
+      <LiveMarket />
+
       <StatusStrip totalActions={totalActions} severity={severity} running={running} />
 
       {/* Agent network + reasoning */}
@@ -170,8 +173,9 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
       </div>
 
       <footer className="text-[11px] text-muted-foreground">
-        Trigger runs the real agents (reasoning + x402); the on-chain write happens when you Approve —
-        the human-in-the-loop gate. Every hash links to cspr.live. No mock data.
+        Trigger runs a stress drill (a simulated USDC depeg) through the real agents — live market data
+        over x402, real reasoning — and the on-chain write happens when you Approve. Every hash links to
+        cspr.live. Live prices from CoinGecko; the depeg is a drill, everything else is real.
       </footer>
     </main>
   );
