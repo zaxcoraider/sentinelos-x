@@ -1,4 +1,4 @@
-import { readState, explorerContractUrl } from '@sentinelos/casper';
+import { readState, readRecentActions, explorerContractUrl, type OnChainAction } from '@sentinelos/casper';
 import { SecurityCenter, type AgentState } from '@/components/security-center';
 
 // Reads live chain state — never cached.
@@ -19,6 +19,13 @@ export default async function SecurityPage() {
     }
   }
 
+  let recent: OnChainAction[] = [];
+  try {
+    recent = await readRecentActions(12);
+  } catch {
+    recent = [];
+  }
+
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-10">
       <header>
@@ -29,7 +36,12 @@ export default async function SecurityPage() {
         </p>
       </header>
 
-      <SecurityCenter agents={agents} totalActions={totalActions} contractUrl={explorerContractUrl()} />
+      <SecurityCenter
+        agents={agents}
+        totalActions={totalActions}
+        contractUrl={explorerContractUrl()}
+        recent={recent}
+      />
     </main>
   );
 }

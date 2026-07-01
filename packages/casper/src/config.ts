@@ -32,6 +32,11 @@ export const PAYMENT_RECORD_ACTION = Number(process.env.CASPER_CALL_PAYMENT ?? 2
 export const PAYMENT_NATIVE_TRANSFER = Number(process.env.CASPER_TRANSFER_PAYMENT ?? 100_000_000);
 export const EXPLORER_BASE = 'https://testnet.cspr.live';
 
+// --- CSPR.cloud REST API (real on-chain activity feed) ---
+export const CSPR_CLOUD_REST_URL = process.env.CSPR_CLOUD_REST_URL ?? 'https://api.testnet.cspr.cloud';
+export const CSPR_CLOUD_API_KEY = process.env.CSPR_CLOUD_API_KEY ?? '';
+export const PUBLIC_KEY_HEX = process.env.CASPER_PUBLIC_KEY_HEX ?? '';
+
 export function readSecretKeyPem(): string {
   return readFileSync(SECRET_KEY_PATH, 'utf8');
 }

@@ -38,6 +38,7 @@ import {
 import { varKey, mappingKeyString, FIELD, decodeU64, decodeU8, decodeString } from './storage.js';
 
 export * from './config.js';
+export { readRecentActions, type OnChainAction } from './events.js';
 
 export function getRpc(): RpcClient {
   return new RpcClient(new HttpHandler(NODE_URL));

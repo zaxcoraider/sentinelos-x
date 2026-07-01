@@ -1,9 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ShieldAlert, Coins, Landmark, ArrowUpRight, Radar, type LucideIcon } from 'lucide-react';
+import { ShieldAlert, Coins, Landmark, ArrowUpRight, Radar, Activity, type LucideIcon } from 'lucide-react';
+import type { OnChainAction } from '@sentinelos/casper';
 import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { cn, shortHash } from '@/lib/utils';
 
 export interface AgentState {
   agent: string;
@@ -23,14 +24,22 @@ function threatLevel(severity: number | null): { label: string; tone: string; ri
   return { label: 'Nominal', tone: 'text-emerald-400', ring: 'ring-emerald-500/30', dot: 'bg-emerald-400' };
 }
 
+const AGENT_TINT: Record<string, string> = { treasury: 'text-emerald-400', governance: 'text-violet-400' };
+
+function clock(at: string) {
+  return new Date(at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
 export function SecurityCenter({
   agents,
   totalActions,
   contractUrl,
+  recent = [],
 }: {
   agents: AgentState[];
   totalActions: number | null;
   contractUrl: string;
+  recent?: OnChainAction[];
 }) {
   const peak = agents.reduce<number | null>(
     (max, a) => (a.lastSeverity !== null ? Math.max(max ?? 0, a.lastSeverity) : max),
@@ -121,10 +130,62 @@ export function SecurityCenter({
         </div>
       </div>
 
+      {/* Real on-chain activity — from CSPR.cloud */}
+      <div>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="flex items-center gap-2 text-sm font-medium uppercase tracking-wide text-muted-foreground">
+            <Activity className="h-3.5 w-3.5" />
+            On-chain activity · live from CSPR.cloud
+          </h2>
+          <a href={contractUrl} target="_blank" rel="noreferrer" className="text-xs text-muted-foreground hover:text-foreground">
+            view contract ↗
+          </a>
+        </div>
+        <Card>
+          <CardContent className="p-0">
+            {recent.length === 0 ? (
+              <div className="px-4 py-8 text-center text-xs text-muted-foreground">
+                No recorded actions indexed yet (or CSPR.cloud key not configured).
+              </div>
+            ) : (
+              <ul className="divide-y divide-border">
+                {recent.map((a) => (
+                  <li key={a.txHash} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
+                    <span className={cn('w-24 shrink-0 font-medium capitalize', AGENT_TINT[a.agent] ?? 'text-foreground')}>
+                      {a.agent}
+                    </span>
+                    <span className="font-mono text-xs text-foreground/90">{a.action}</span>
+                    <span className="text-xs text-muted-foreground">sev {a.severity ?? '—'}</span>
+                    {a.value ? (
+                      <span className="text-xs text-muted-foreground">
+                        ~${Number(a.value).toLocaleString()}
+                      </span>
+                    ) : null}
+                    <span className="ml-auto flex items-center gap-3">
+                      <span className={cn('h-1.5 w-1.5 rounded-full', a.success ? 'bg-emerald-400' : 'bg-red-500')} />
+                      <span className="font-mono text-[11px] text-muted-foreground">{clock(a.timestamp)}</span>
+                      <a
+                        href={a.explorerUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 font-mono text-[11px] text-primary hover:underline"
+                      >
+                        {shortHash(a.txHash)}
+                        <ArrowUpRight className="h-3 w-3" />
+                      </a>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       <p className="text-xs text-muted-foreground">
-        Threat state is derived from the on-chain TreasuryGuard contract (last recorded action + severity per
-        agent). Full per-event history — including every <code className="font-mono">ActionRecorded</code> event —
-        is verifiable on cspr.live. No mock data.
+        The activity feed is the <span className="text-foreground">real</span> on-chain history of
+        <code className="mx-1 font-mono">record_action</code> calls, indexed live by CSPR.cloud — every row links
+        to its verifiable transaction on cspr.live. No mock data.
       </p>
     </div>
   );
