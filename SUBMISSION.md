@@ -99,7 +99,7 @@ agents it needs. SentinelOS — the autonomous OS for Web3."
 - [ ] `npm run start --workspace @sentinelos/premium-data` (x402 feed on :4021)
 - [ ] `npm run dev --workspace @sentinelos/web` (dashboard on :3000)
 - [ ] Funded testnet key present at `keys/secret_key.pem`; `.env` has DGrid/LLM config + balance
-- [ ] Walk Dashboard → Agent Team → Crisis (trigger the depeg, let it stream) → Security Center
+- [ ] Walk Mission Control → Agent Team → Crisis (trigger the depeg, let it stream) → Governance Council → Security Center
 - [ ] Click through at least one tx hash to cspr.live on camera
 - [ ] Record ≤ 3 min; upload; paste the link into the DoraHacks form and the README
 ```

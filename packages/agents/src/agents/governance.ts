@@ -5,7 +5,7 @@ import type { MarketEvent, RiskAssessment, TreasuryDecision, GovernanceProposal 
 const GovernanceSchema = z.object({
   title: z
     .string()
-    .describe('Short emergency-proposal title, e.g. "Emergency: Rebalance USDx reserves".'),
+    .describe('Short emergency-proposal title, e.g. "Emergency: Rebalance USDC reserves".'),
   summary: z
     .string()
     .describe('One-paragraph summary of the situation and proposed response, written for voters.'),

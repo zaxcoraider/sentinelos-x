@@ -73,9 +73,10 @@ mock data. (Or run it locally — see [Run it yourself](#run-it-yourself).)
 
 | Module | Status |
 |--------|--------|
-| **Dashboard** — protocol status, agents online, threat level, on-chain actions | 🟢 Live |
+| **Mission Control** — live agent network, streaming reasoning, threat + on-chain status | 🟢 Live |
 | **Crisis Response** — streamed depeg → trace → x402 → tx → recover | 🟢 Live |
 | **Agent Team** — installable agent cards (4 live, 8 marketplace) | 🟢 Live |
+| **Governance Council** — AI council debates the response and submits a motion on-chain | 🟢 Live |
 | **Security Center** — threat radar over on-chain state + event log | 🟢 Live |
 | Analytics · Marketplace checkout · Smart Contract Center · Settings | 🔵 Coming in v1 |
 

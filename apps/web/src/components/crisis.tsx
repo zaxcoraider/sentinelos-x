@@ -400,7 +400,7 @@ export function Crisis() {
       </AnimatePresence>
 
       <footer className="text-xs text-muted-foreground">
-        Phase 6 · live agents (Risk · Commander · Treasury · Governance) + x402 + on-chain records. No mock data.
+        Live agents (Risk · Commander · Treasury · Governance) + x402 + on-chain records. No mock data.
       </footer>
     </main>
   );

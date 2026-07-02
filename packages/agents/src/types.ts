@@ -38,7 +38,7 @@ export interface TreasuryDecision {
 
 /** An emergency governance proposal drafted by the Governance Agent. */
 export interface GovernanceProposal {
-  /** Short proposal title, e.g. "Emergency: Rebalance USDx reserves". */
+  /** Short proposal title, e.g. "Emergency: Rebalance USDC reserves". */
   title: string;
   /** One-paragraph summary of the situation and response, for voters. */
   summary: string;
