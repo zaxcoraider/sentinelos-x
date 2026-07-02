@@ -3,9 +3,17 @@
 import { useCallback, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+  Radio,
   ShieldAlert,
+  LineChart,
   Compass,
+  ScrollText,
+  Droplets,
   Coins,
+  Umbrella,
+  Sprout,
+  Users,
+  Gavel,
   Landmark,
   ArrowUpRight,
   Loader2,
@@ -29,9 +37,17 @@ type Phase = 'idle' | 'running' | 'done' | 'error';
 const DEFAULT_EVENT: MarketEvent = { type: 'DEPEG', asset: 'USDC', deviation: 0.07 };
 
 const AGENT_META: Record<AgentRole, { icon: typeof ShieldAlert; color: string; ring: string; label: string }> = {
+  Oracle: { icon: Radio, color: 'text-sky-400', ring: 'ring-sky-500/30', label: 'Oracle Agent' },
   Risk: { icon: ShieldAlert, color: 'text-amber-400', ring: 'ring-amber-500/30', label: 'Risk Agent' },
-  Commander: { icon: Compass, color: 'text-sky-400', ring: 'ring-sky-500/30', label: 'Commander' },
+  Analytics: { icon: LineChart, color: 'text-orange-400', ring: 'ring-orange-500/30', label: 'Analytics Agent' },
+  Commander: { icon: Compass, color: 'text-blue-400', ring: 'ring-blue-500/30', label: 'Commander' },
+  Compliance: { icon: ScrollText, color: 'text-teal-400', ring: 'ring-teal-500/30', label: 'Compliance Agent' },
+  Liquidity: { icon: Droplets, color: 'text-cyan-400', ring: 'ring-cyan-500/30', label: 'Liquidity Agent' },
   Treasury: { icon: Coins, color: 'text-emerald-400', ring: 'ring-emerald-500/30', label: 'Treasury Agent' },
+  Insurance: { icon: Umbrella, color: 'text-violet-300', ring: 'ring-violet-400/30', label: 'Insurance Agent' },
+  Growth: { icon: Sprout, color: 'text-lime-400', ring: 'ring-lime-500/30', label: 'Growth Agent' },
+  Community: { icon: Users, color: 'text-pink-400', ring: 'ring-pink-500/30', label: 'Community Agent' },
+  Legal: { icon: Gavel, color: 'text-slate-300', ring: 'ring-slate-400/30', label: 'Legal Agent' },
   Governance: { icon: Landmark, color: 'text-violet-400', ring: 'ring-violet-500/30', label: 'Governance Agent' },
 };
 

@@ -1,23 +1,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {
-  ShieldAlert,
-  Coins,
-  Landmark,
-  Radio,
-  ScrollText,
-  LineChart,
-  Umbrella,
-  Lock,
-  BrainCircuit,
-  type LucideIcon,
-} from 'lucide-react';
+import { BrainCircuit, type LucideIcon } from 'lucide-react';
 import type { AgentRole } from '@sentinelos/agents';
+import { AGENT_META } from './agent-meta';
 
 interface GNode {
-  id: string;
-  live: boolean; // wired to the real pipeline
+  id: AgentRole;
+  live: boolean; // every agent is now wired to the real pipeline
   role: string;
   label: string;
   color: string;
@@ -27,22 +17,34 @@ interface GNode {
 
 const CX = 360;
 const CY = 210;
-const RX = 262;
-const RY = 150;
+const RX = 268;
+const RY = 156;
 
-// 8 agents around the Commander hub. The four "live" ones (Risk, Treasury,
-// Governance + the Commander hub) are wired to the real pipeline; the rest are
-// roadmap agents rendered dimmer — the same set shown as "Coming in v1".
-const NODES: GNode[] = [
-  { id: 'Risk', live: true, role: 'Threat scoring', label: 'Risk Agent', color: '#F59E0B', icon: ShieldAlert, angle: 270 },
-  { id: 'Governance', live: true, role: 'Proposal', label: 'Governance', color: '#8B5CF6', icon: Landmark, angle: 318 },
-  { id: 'Oracle', live: false, role: 'Data feeds', label: 'Oracle', color: '#38BDF8', icon: Radio, angle: 12 },
-  { id: 'Compliance', live: false, role: 'Checks', label: 'Compliance', color: '#2DD4BF', icon: ScrollText, angle: 55 },
-  { id: 'Analytics', live: false, role: 'Insights', label: 'Analytics', color: '#F97316', icon: LineChart, angle: 90 },
-  { id: 'Insurance', live: false, role: 'Coverage', label: 'Insurance', color: '#A78BFA', icon: Umbrella, angle: 125 },
-  { id: 'Security', live: false, role: 'Defense', label: 'Security', color: '#EF4444', icon: Lock, angle: 168 },
-  { id: 'Treasury', live: true, role: 'Action', label: 'Treasury', color: '#22C55E', icon: Coins, angle: 222 },
+// All 11 non-Commander agents orbit the Commander hub — every one is live and
+// wired to the real pipeline. Evenly spaced (360/11°) around the ring.
+const RING: { id: AgentRole; role: string; angle: number }[] = [
+  { id: 'Oracle', role: 'Live feed', angle: 270 },
+  { id: 'Risk', role: 'Threat score', angle: 302.7 },
+  { id: 'Analytics', role: 'Anomaly', angle: 335.5 },
+  { id: 'Governance', role: 'Proposal', angle: 8.2 },
+  { id: 'Legal', role: 'Legal', angle: 40.9 },
+  { id: 'Community', role: 'Comms', angle: 73.6 },
+  { id: 'Growth', role: 'Growth', angle: 106.4 },
+  { id: 'Insurance', role: 'Coverage', angle: 139.1 },
+  { id: 'Treasury', role: 'Action', angle: 171.8 },
+  { id: 'Liquidity', role: 'Depth', angle: 204.5 },
+  { id: 'Compliance', role: 'Policy', angle: 237.3 },
 ];
+
+const NODES: GNode[] = RING.map((n) => ({
+  id: n.id,
+  live: true,
+  role: n.role,
+  label: AGENT_META[n.id].label.replace(' Agent', ''),
+  color: AGENT_META[n.id].color,
+  icon: AGENT_META[n.id].icon,
+  angle: n.angle,
+}));
 
 function pos(angle: number) {
   const rad = (angle * Math.PI) / 180;

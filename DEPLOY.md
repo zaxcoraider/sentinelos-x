@@ -28,9 +28,17 @@ local `.env` / keys — **never commit them**). Contract + public key are public
 | `AGENT_AUTH_STYLE` | `bearer` | agent reasoning |
 | `CSPR_CLOUD_API_KEY` | your CSPR.cloud key (from `.env`) | on-chain activity feed |
 | `X402_MODE` | `stub` (recommended) — `live` spends CSPR per run + needs the key | x402 leg |
+| `AGENTS_ONCHAIN` | **`core`** on Vercel (Treasury + Governance only) | caps on-chain spend |
+
+> **`AGENTS_ONCHAIN` — important on Vercel.** All 12 agents can anchor their own
+> `record_action` (~20 CSPR each → **~240 CSPR per incident** in `all` mode), which also
+> won't finish inside Hobby's 60s. So set **`AGENTS_ONCHAIN=core`** on Vercel (only Treasury +
+> Governance write; the other 10 still run + stream their real analysis). Run the full 12-tx
+> money-shot **locally** for the video: `AGENTS_ONCHAIN=all` (the default) with no 60s limit.
 
 Optional (have sensible defaults): `CASPER_NODE_URL`, `CASPER_CHAIN_NAME`,
-`CSPR_CLOUD_REST_URL`, `PREMIUM_DATA_URL` (auto-derived from `VERCEL_URL`).
+`CSPR_CLOUD_REST_URL`, `PREMIUM_DATA_URL` (auto-derived from `VERCEL_URL`),
+`AGENT_FAST_MODEL` (advisory agents; defaults to `AGENT_MODEL`).
 
 ### Base64 the signing key
 

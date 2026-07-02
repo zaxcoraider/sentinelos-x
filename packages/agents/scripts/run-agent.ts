@@ -9,9 +9,17 @@ const event: MarketEvent = { type: 'DEPEG', asset: 'USDC', deviation: 0.07 };
 const live = !process.argv.includes('--dry');
 
 const icon: Record<TraceStep['agent'], string> = {
+  Oracle: '📡',
   Risk: '🛡',
+  Analytics: '📊',
   Commander: '🧭',
+  Compliance: '⚖️',
+  Liquidity: '🌊',
   Treasury: '💰',
+  Insurance: '🛟',
+  Growth: '🌱',
+  Community: '📣',
+  Legal: '📜',
   Governance: '🏛',
 };
 
@@ -43,6 +51,7 @@ async function main() {
   if (result.governanceTx) {
     console.log(`✅ Governance on-chain: ${result.governanceTx.explorerUrl}`);
   }
+  console.log(`\n🤖 agents run: ${result.trace.length} · advisories: ${result.advisories.length} · on-chain records: ${result.onChainAgentCount}`);
 }
 
 main().catch((err) => {

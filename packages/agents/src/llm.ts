@@ -29,14 +29,15 @@ export async function reason<S extends z.ZodType>(
   schema: S,
   system: string,
   user: string,
+  opts: { model?: string; maxTokens?: number } = {},
 ): Promise<z.infer<S>> {
   const toolName = `emit_${name.toLowerCase()}`;
   // Zod v4 → JSON Schema for the tool's input contract.
   const inputSchema = z.toJSONSchema(schema) as Anthropic.Tool.InputSchema;
 
   const res = await getClient().messages.create({
-    model: AGENT_MODEL,
-    max_tokens: 4096,
+    model: opts.model ?? AGENT_MODEL,
+    max_tokens: opts.maxTokens ?? 4096,
     system,
     messages: [{ role: 'user', content: user }],
     tools: [

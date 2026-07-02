@@ -9,9 +9,10 @@
 Built for the **Casper Agentic Buildathon 2026** (Agentic AI track) on **Casper Network 2.0**
 (Rust → WASM via [Odra](https://odra.dev)). Not EVM, not Solana.
 
-**Live today:** Commander · Risk · Treasury · Governance agents · x402 payments · an on-chain
-`TreasuryGuard` contract · a multi-page dashboard.
-**Verifiable:** every "real" action links to a transaction on [cspr.live](https://testnet.cspr.live).
+**Live today:** a **full 12-agent team** — each one anchors its own action to the on-chain
+`TreasuryGuard` contract during an incident · x402 payments over the official Casper facilitator
+· a multi-page dashboard.
+**Verifiable:** every agent's action is a real transaction on [cspr.live](https://testnet.cspr.live) — one incident, ~12 on-chain proofs.
 
 ---
 
@@ -22,11 +23,15 @@ with zero human keystrokes, captured from a live run:
 
 ```
 🛡  Risk        → severity 82/100 (Claude): "severe deviation, collateral stress"
-🧭  Commander   → 82 > 60 threshold → wake Treasury
-💰  Treasury    → pays for REAL market data over x402 (live CoinGecko vol + peg,
-                  real CSPR settlement) → decides REBALANCE (88%, ~$4.2M protected)
-                → records the action on-chain (TreasuryGuard)
-🏛  Governance  → drafts an emergency proposal, anchors it on-chain for the DAO
+📡  Oracle      → pulls the premium feed over x402 (real Casper facilitator + CSPR
+                  settlement), confirms USDC peg + ETH reference — anchored on-chain
+📊  Analytics   → real annualized vol → STRESSED regime, 24h depeg probability — anchored
+🧭  Commander   → 82 > 60 threshold → wake the full team
+💰  Treasury    → decides REBALANCE (88%, ~$4.2M protected) → executes on-chain
+⚖️🌊🛟🌱📣📜  Compliance · Liquidity · Insurance · Growth · Community · Legal
+                → six domain agents weigh in (Claude), each anchored on-chain
+🏛  Governance  → drafts an emergency proposal, anchors it for the DAO
+                → 12 agents · ~12 verifiable Casper transactions · one incident
 ```
 
 > **Honesty:** the USDC price/volatility the agents read is **real and live** (CoinGecko);
@@ -59,15 +64,27 @@ mock data. (Or run it locally — see [Run it yourself](#run-it-yourself).)
 
 ## What's live vs. roadmap (we never label mock data as real)
 
-### Agents
+### Agents — all 12 live, each anchors its own `record_action` on Casper
 
-| Agent | Role | Status |
-|-------|------|--------|
-| **Commander** | Orchestrator — routes work, decides who acts (deterministic threshold gate) | 🟢 Live |
-| **Risk** | Scores event severity 0–100 with a grounded rationale (Claude) | 🟢 Live |
-| **Treasury** | Buys data over x402, decides the protective action, writes it on-chain | 🟢 Live |
-| **Governance** | Drafts emergency proposals and anchors them on-chain for a vote | 🟢 Live |
-| Oracle · Compliance · Analytics · Insurance · Growth · Community · Legal · Liquidity | The rest of the team | 🔵 Coming in v1 |
+| Agent | Role | On-chain |
+|-------|------|----------|
+| **Commander** | Orchestrator — routes work on a deterministic threshold gate | 🟢 `ROUTE` |
+| **Oracle** | Acquires the premium feed over x402, confirms the live peg + reference price | 🟢 `FEED_CONFIRMED` |
+| **Risk** | Scores event severity 0–100 with a grounded rationale (Claude) | 🟢 `ASSESS` |
+| **Analytics** | Real annualized volatility, regime, modeled depeg probability (deterministic) | 🟢 `ANOMALY` |
+| **Compliance** | Reviews the action against policy + regulatory expectations (Claude) | 🟢 `CLEARED`/`FLAGGED` |
+| **Liquidity** | Slippage / market-depth check on the action (Claude) | 🟢 `CLEARED`/`CAUTION` |
+| **Treasury** | Decides the protective action and executes it on-chain (Claude) | 🟢 action, e.g. `REBALANCE` |
+| **Insurance** | Reserve / coverage-adequacy assessment (Claude) | 🟢 `CLEARED`/`CAUTION` |
+| **Growth** | TVL/retention impact + incentive response (Claude) | 🟢 `CLEARED`/`CAUTION` |
+| **Community** | Sentiment + communications posture (Claude) | 🟢 `CLEARED`/`CAUTION` |
+| **Legal** | Legal/entity exposure + disclosure flags (Claude) | 🟢 `CLEARED`/`FLAGGED` |
+| **Governance** | Drafts the emergency proposal and anchors it for the DAO (Claude) | 🟢 `PROPOSAL` |
+
+> **Honest split:** Treasury + Governance take protocol **actions**; the other ten contribute
+> real **data/analysis** (Oracle + Analytics are deterministic over live market data, the six
+> advisory agents are real Claude reasoning). Every one anchors a verifiable `record_action`
+> to TreasuryGuard, so a single incident produces ~12 transactions on cspr.live.
 
 ### Product
 

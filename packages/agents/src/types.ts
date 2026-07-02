@@ -7,7 +7,22 @@ export interface MarketEvent {
   [key: string]: unknown;
 }
 
-export type AgentRole = 'Risk' | 'Commander' | 'Treasury' | 'Governance';
+export type AgentRole =
+  | 'Oracle'
+  | 'Risk'
+  | 'Analytics'
+  | 'Commander'
+  | 'Compliance'
+  | 'Liquidity'
+  | 'Treasury'
+  | 'Insurance'
+  | 'Growth'
+  | 'Community'
+  | 'Legal'
+  | 'Governance';
+
+/** The six domain-advisory agents (real Claude reasoning, no execution). */
+export type AdvisoryRole = 'Compliance' | 'Liquidity' | 'Insurance' | 'Growth' | 'Community' | 'Legal';
 
 /** One step of the agent pipeline, captured for the UI / demo trace. */
 export interface TraceStep {
@@ -54,6 +69,33 @@ export interface GovernanceProposal {
   quorumPercent: number;
 }
 
+/** Oracle Agent: a deterministic snapshot of the live monitored feed. */
+export interface OracleReport {
+  stablePriceUsd: number;
+  pegDeviation: number; // |1 - price|
+  refAsset: string; // e.g. ETH
+  refPriceUsd: number;
+  ref24hChange: number;
+  headline: string;
+}
+
+/** Analytics Agent: deterministic anomaly metrics derived from the live feed. */
+export interface AnalyticsReport {
+  annualizedVol: number;
+  regime: string;
+  depegProbability24h: number;
+  headline: string;
+}
+
+/** One domain-advisory agent's assessment of the incident + response. */
+export interface AdvisoryAssessment {
+  role: AdvisoryRole;
+  headline: string;
+  assessment: string;
+  /** clear = no concern · caution = watch · flag = needs attention. */
+  status: 'clear' | 'caution' | 'flag';
+}
+
 export interface OnChainResult {
   txHash: string;
   explorerUrl: string;
@@ -72,5 +114,13 @@ export interface PipelineResult {
   governance: GovernanceProposal | null;
   /** On-chain record anchoring the governance proposal, if written. */
   governanceTx: OnChainResult | null;
+  /** Oracle Agent's live-feed snapshot (deterministic, from real market data). */
+  oracle: OracleReport | null;
+  /** Analytics Agent's anomaly metrics (deterministic, from real market data). */
+  analytics: AnalyticsReport | null;
+  /** Domain-advisory agents' assessments (Compliance, Liquidity, Insurance, Growth, Community, Legal). */
+  advisories: AdvisoryAssessment[];
+  /** How many agents anchored a real record_action on Casper this run. */
+  onChainAgentCount: number;
   trace: TraceStep[];
 }

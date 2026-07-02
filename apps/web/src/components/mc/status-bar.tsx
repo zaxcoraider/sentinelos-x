@@ -31,7 +31,7 @@ export function StatusBar({ running }: { running: boolean }) {
           Casper Testnet
         </span>
       </Item>
-      <Item label="Agents">4 / 12 online</Item>
+      <Item label="Agents">12 / 12 online</Item>
       <Item label="Pipeline">
         <span className={running ? 'text-warning' : 'text-foreground/80'}>{running ? 'responding' : 'monitoring'}</span>
       </Item>

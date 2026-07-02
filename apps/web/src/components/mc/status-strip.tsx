@@ -26,9 +26,9 @@ export function StatusStrip({
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-      <StatCard icon={Bot} label="Agents Online" tone="96, 165, 250" index={0} footer="Commander · Risk · Treasury · Gov">
+      <StatCard icon={Bot} label="Agents Online" tone="96, 165, 250" index={0} footer="full 12-agent team, live">
         <div className="flex items-baseline gap-1">
-          <span className="font-mono text-3xl font-semibold text-foreground">4</span>
+          <span className="font-mono text-3xl font-semibold text-foreground">12</span>
           <span className="text-sm text-muted-foreground">/ 12</span>
         </div>
       </StatCard>

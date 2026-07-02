@@ -43,6 +43,24 @@ export const AGENT_EFFORT = (process.env.AGENT_EFFORT ?? 'medium') as
   | 'high'
   | 'max';
 
+/**
+ * Faster/cheaper model for the 6 domain-advisory agents (Compliance, Liquidity,
+ * Insurance, Growth, Community, Legal) — they run in parallel, so a lighter
+ * model keeps latency + spend down. Defaults to AGENT_MODEL if unset; on DGrid
+ * set e.g. AGENT_FAST_MODEL=anthropic/claude-haiku-4.5.
+ */
+export const AGENT_FAST_MODEL = process.env.AGENT_FAST_MODEL ?? AGENT_MODEL;
+
+/** Run the 6 domain-advisory agents. Off → just the 6 core/data agents. */
+export const ADVISORY_ENABLED = (process.env.ADVISORY_ENABLED ?? 'true') !== 'false';
+
+/**
+ * Which agents anchor a real record_action on Casper:
+ *   'all'  → every agent that runs writes its own on-chain proof (the demo).
+ *   'core' → only Treasury + Governance write (cheap/fast; e.g. Vercel's 60s).
+ */
+export const AGENTS_ONCHAIN = (process.env.AGENTS_ONCHAIN ?? 'all') === 'core' ? 'core' : 'all';
+
 /** Commander routes the event to Treasury only when Risk severity exceeds this. */
 export const ROUTE_THRESHOLD = Number(process.env.AGENT_ROUTE_THRESHOLD ?? 60);
 

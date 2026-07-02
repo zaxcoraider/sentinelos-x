@@ -22,12 +22,17 @@ another agent — it's the OS those agents run on, and a marketplace where anyon
 new ones.
 
 **What it does:**
-- Four live AI agents run an autonomous crisis loop over an on-chain treasury.
-- Risk scores a market event (0–100); Commander routes on a threshold; Treasury pays for
-  **real live market data** (CoinGecko ETH vol + USDC peg) over **x402** (a real native CSPR
-  settlement), decides a protective action, and records it on-chain; Governance drafts an
-  emergency proposal and anchors it on-chain.
-- A Next.js "Mission Control" dashboard streams the whole trace live — an animated agent
+- A **12-agent team** runs an autonomous crisis loop over an on-chain treasury, and **every
+  agent anchors its own `record_action` on Casper** — one incident, ~12 verifiable transactions.
+- Oracle pulls **real live market data** (CoinGecko ETH vol + USDC peg) over **x402** (paid via
+  the official Casper facilitator); Analytics quantifies the anomaly; Risk scores it; Commander
+  routes; Treasury decides + executes the protective action on-chain; six domain agents
+  (Compliance, Liquidity, Insurance, Growth, Community, Legal) weigh in with real Claude
+  reasoning; Governance drafts + anchors an emergency proposal.
+- Honest split: Treasury + Governance take protocol **actions**; the other ten contribute real
+  **data/analysis** (Oracle + Analytics deterministic over live data; six advisory agents are
+  real Claude). All twelve anchor a verifiable record on-chain.
+- A Next.js "Mission Control" dashboard streams the whole trace live — an animated 12-node agent
   network, reasoning panel, and event timeline — and links every action to cspr.live.
 - The monitored asset is real USDC (live peg); the depeg is a clearly-labeled stress drill.
 
@@ -53,9 +58,9 @@ on-chain event feed), Odra, live handshake to the official **Casper x402 facilit
 - Treasury record_action — https://testnet.cspr.live/transaction/6dbd5cf3ce7f45b7b3fa646e3d015982f6df364a95b2a889fc7eb1a3ba043f15
 - Governance PROPOSAL — https://testnet.cspr.live/transaction/7578c580f17e5e3580d346411c785cc8dae7a011ad426ef363753f6918043e8d
 
-**What's next (v1):** the other 8 agents (Oracle, Compliance, Analytics, Insurance, Growth,
-Community, Legal, Liquidity), a full Governance council vote, an agent marketplace/SDK, and
-multi-protocol coverage.
+**What's next (v1):** an agent **marketplace + Developer SDK** (publish/install agents), a full
+token-weighted Governance vote, and multi-protocol coverage — turning the 12-agent team into an
+open platform any protocol installs.
 
 ---
 
@@ -66,13 +71,14 @@ multi-protocol coverage.
 
 **0:00–0:25 — The hook (Mission Control)**
 > "Most Web3 AI answers questions. SentinelOS *runs the protocol*."
-Show Mission Control: the live agent network, Protocol Health 100%, Agents 4/12, real on-chain
-tx count, and the **Live Market bar monitoring real USDC ($0.9996, peg holding · CoinGecko)**.
-"Four AI agents, live, watching a real treasury on Casper — with real market data."
+Show Mission Control: the 12-node live agent network, Protocol Health 100%, Agents 12/12, real
+on-chain tx count, and the **Live Market bar monitoring real USDC ($0.9996, peg holding · CoinGecko)**.
+"Twelve AI agents, live, running a real treasury on Casper — with real market data."
 
 **0:25–0:50 — The team (Agent Team)**
-Click **Agent Team**. "Commander, Risk, Treasury, Governance — live, acting on-chain today.
-Eight more ship in v1. We never fake it: green means real, grey means roadmap."
+Click **Agent Team**. "Twelve agents — all live, all acting on-chain. Treasury and Governance
+take protocol actions; the other ten add real data and analysis — and every one anchors a
+verifiable record to Casper. We never fake it."
 
 **0:50–2:05 — The crisis — the wow moment**
 On Mission Control, click **Trigger incident** (a USDC depeg stress drill). Narrate as the
