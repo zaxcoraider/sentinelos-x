@@ -1,9 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-  ShieldCheck,
   Network,
   Zap,
   Bot,
@@ -85,9 +85,16 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
 function Brand() {
   return (
     <a href="/" className="flex items-center gap-3">
-      <div className="mc-float relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-ai text-white shadow-[0_0_24px_-4px_hsl(var(--primary))]">
-        <ShieldCheck className="h-5 w-5" />
-        <span className="absolute inset-0 rounded-xl ring-1 ring-white/20" />
+      <div className="mc-float relative h-10 w-10 shrink-0">
+        <Image
+          src="/logo.png"
+          alt="SentinelOS"
+          width={40}
+          height={40}
+          priority
+          className="h-10 w-10 rounded-xl object-cover shadow-[0_0_24px_-6px_hsl(var(--primary))]"
+        />
+        <span className="absolute inset-0 rounded-xl ring-1 ring-white/15" />
       </div>
       <div className="leading-tight">
         <div className="text-[15px] font-semibold tracking-tight">SentinelOS</div>

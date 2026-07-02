@@ -5,8 +5,8 @@ import { VideoBackground } from '@/components/mc/video-background';
 import { CustomCursor } from '@/components/mc/custom-cursor';
 
 export const metadata: Metadata = {
-  title: 'SentinelOS X — Autonomous OS for Web3',
-  description: 'Autonomous treasury sentinel on Casper 2.0',
+  title: 'SentinelOS · Autonomous OS · Web3',
+  description: 'SentinelOS — an autonomous operating system for Web3 protocols. AI agents. On-chain. Always on. Built on Casper.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
