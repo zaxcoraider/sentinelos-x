@@ -53,10 +53,12 @@ on-chain event feed), Odra, live handshake to the official **Casper x402 facilit
 - Contract package: https://testnet.cspr.live/contract-package/7f56caa1d89d394786354bc382b1896fcd21fd77d0cea33c41a54e28c56990db
 - Demo video: `<add link>`
 
-**Verifiable on-chain (from a live run):**
-- x402 settlement — https://testnet.cspr.live/transaction/3ed1ab89485c1f72476ada58d77352faea292fd07ad0dcf43f00c9e23a4d37e3
-- Treasury record_action — https://testnet.cspr.live/transaction/6dbd5cf3ce7f45b7b3fa646e3d015982f6df364a95b2a889fc7eb1a3ba043f15
-- Governance PROPOSAL — https://testnet.cspr.live/transaction/7578c580f17e5e3580d346411c785cc8dae7a011ad426ef363753f6918043e8d
+**Verifiable on-chain (one live incident — 12 agents, 12 transactions, `total_actions` 8→20):**
+- Treasury `REBALANCE` — https://testnet.cspr.live/transaction/558753bf1aa084563dad75bbd978db914be112a505fc21b70d116c67b4875161
+- Governance `PROPOSAL` — https://testnet.cspr.live/transaction/996dff137cfda9869a2c0eadfe7fa8f9c84971bf1fecd675f95a28069c2416e2
+- Oracle `FEED_CONFIRMED` — https://testnet.cspr.live/transaction/1c6132d49f804de4191e831a0d77985bd4e7c713bfa967e53e596239bbeaa00b
+- x402 settlement (via Casper facilitator) — https://testnet.cspr.live/transaction/f82bbf7f76caff29b613ed21dca3ac76ab9ed63e928da9f66f73f9f196374c6d
+- **All 12 agent records** (Risk, Analytics, Commander, Compliance, Liquidity, Insurance, Growth, Community, Legal + the above) are listed in the README's on-chain-proof table.
 
 **What's next (v1):** an agent **marketplace + Developer SDK** (publish/install agents), a full
 token-weighted Governance vote, and multi-protocol coverage — turning the 12-agent team into an

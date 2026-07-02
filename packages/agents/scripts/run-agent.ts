@@ -52,6 +52,14 @@ async function main() {
     console.log(`✅ Governance on-chain: ${result.governanceTx.explorerUrl}`);
   }
   console.log(`\n🤖 agents run: ${result.trace.length} · advisories: ${result.advisories.length} · on-chain records: ${result.onChainAgentCount}`);
+
+  const onChain = result.trace.filter((s) => typeof s.detail?.explorerUrl === 'string');
+  if (onChain.length) {
+    console.log(`\n⛓  ${onChain.length} verifiable Casper transactions this incident:`);
+    for (const s of onChain) {
+      console.log(`  ${icon[s.agent]} ${s.agent.padEnd(11)} ${s.detail.explorerUrl as string}`);
+    }
+  }
 }
 
 main().catch((err) => {

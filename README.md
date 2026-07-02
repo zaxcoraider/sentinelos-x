@@ -38,13 +38,26 @@ with zero human keystrokes, captured from a live run:
 > the depeg shock is a labeled drill; the reasoning, x402 settlement, and on-chain records are
 > all real. We never present a simulated event as a real-world one.
 
-**On-chain proof (Casper Testnet):**
+**On-chain proof — one real incident, 12 agents, 12 transactions (Casper Testnet):**
 
-| Leg | Transaction |
-|-----|-------------|
-| x402 settlement (native CSPR transfer) | [`3ed1ab89…`](https://testnet.cspr.live/transaction/3ed1ab89485c1f72476ada58d77352faea292fd07ad0dcf43f00c9e23a4d37e3) |
-| Treasury `record_action` | [`6dbd5cf3…`](https://testnet.cspr.live/transaction/6dbd5cf3ce7f45b7b3fa646e3d015982f6df364a95b2a889fc7eb1a3ba043f15) |
-| Governance `PROPOSAL` | [`7578c580…`](https://testnet.cspr.live/transaction/7578c580f17e5e3580d346411c785cc8dae7a011ad426ef363753f6918043e8d) |
+From a single live run (`total_actions` went **8 → 20**), every agent anchored its own action:
+
+| Agent | Action | Transaction |
+|-------|--------|-------------|
+| 📡 Oracle | `FEED_CONFIRMED` | [`1c6132d4…`](https://testnet.cspr.live/transaction/1c6132d49f804de4191e831a0d77985bd4e7c713bfa967e53e596239bbeaa00b) |
+| 🛡 Risk | `ASSESS` | [`3baa239e…`](https://testnet.cspr.live/transaction/3baa239e7a9f385359a2d36f5a0fc5172915f4a6e9e9f12154116f9ced5e82a9) |
+| 📊 Analytics | `ANOMALY` | [`ea0a0f81…`](https://testnet.cspr.live/transaction/ea0a0f81589d579e7698a3fcd50f80ecf4e9ddaefd0c74a02f938285ea4f3abe) |
+| 🧭 Commander | `ROUTE` | [`d07af776…`](https://testnet.cspr.live/transaction/d07af776a50dd51d0f5df9b5ced3ed080099d68c2e306ac78f17758850d12484) |
+| 💰 Treasury | `REBALANCE` | [`558753bf…`](https://testnet.cspr.live/transaction/558753bf1aa084563dad75bbd978db914be112a505fc21b70d116c67b4875161) |
+| ⚖️ Compliance | `CAUTION` | [`0df8a44b…`](https://testnet.cspr.live/transaction/0df8a44bb50bf568e0d1abdbf684121ad60ed92e25e66285ba0537b6b029f7f1) |
+| 🌊 Liquidity | `CAUTION` | [`2fbcd0d5…`](https://testnet.cspr.live/transaction/2fbcd0d5fcc99da7531cc9bb5aa4274c30dec30bc29efac13914a4b581d47152) |
+| 🛟 Insurance | `CAUTION` | [`2058f352…`](https://testnet.cspr.live/transaction/2058f352c61a2bb7c95c7adb17e8fb7fa4b4fcceed57f941e09d7f24e899f263) |
+| 🌱 Growth | `CAUTION` | [`9e7e0457…`](https://testnet.cspr.live/transaction/9e7e04574c44468289e922642a19cffa88b1beef013dc07b0db201221b8e47eb) |
+| 📣 Community | `CAUTION` | [`b55d1c51…`](https://testnet.cspr.live/transaction/b55d1c51f2841803e3fbe64af5ec770a6d7d06766a70e38d6b2743223a17debf) |
+| 📜 Legal | `CAUTION` | [`5bfa7239…`](https://testnet.cspr.live/transaction/5bfa7239968e649434ec8547b7f28474d1d289782dfb2bdae0bdffa2f70f57ef) |
+| 🏛 Governance | `PROPOSAL` | [`996dff13…`](https://testnet.cspr.live/transaction/996dff137cfda9869a2c0eadfe7fa8f9c84971bf1fecd675f95a28069c2416e2) |
+
+Plus the **x402 settlement** paid over the official Casper facilitator: [`f82bbf7f…`](https://testnet.cspr.live/transaction/f82bbf7f76caff29b613ed21dca3ac76ab9ed63e928da9f66f73f9f196374c6d).
 
 The dashboard replays this loop live at **/crisis** — each agent's reasoning streams in as it
 actually happens, with the tx hashes linking out to cspr.live.
