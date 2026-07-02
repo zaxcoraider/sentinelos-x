@@ -104,11 +104,13 @@ mock data. (Or run it locally — see [Run it yourself](#run-it-yourself).)
 - **Agents** — `packages/agents`: Commander/Risk/Treasury/Governance on **Claude**
   (`@anthropic-ai/sdk`, tool-based structured output) reached through the **DGrid** gateway.
   The orchestrator is a deterministic graph (Risk → Commander gate → Treasury → Governance).
-- **x402** — `services/premium-data`: an HTTP **402 Payment Required** feed; the client pays
-  with a real native CSPR transfer, then unlocks **real live market data** (CoinGecko ETH
-  volatility + USDC peg, computed server-side). The x402 fetch is
-  best-effort — the loop still proceeds if the feed is down, so **qualification never depends
-  on x402**.
+- **x402** — `services/premium-data`: an HTTP **402 Payment Required** feed. On the challenge,
+  the client calls the **official hosted Casper x402 facilitator** (`x402-facilitator.cspr.cloud`,
+  authenticated with our CSPR.cloud key) to confirm the `exact` scheme is live on
+  `casper:casper-test` and read its settlement `feePayer`, then settles and unlocks **real live
+  market data** (CoinGecko ETH volatility + USDC peg, computed server-side). The x402 fetch is
+  best-effort — the loop still proceeds if the feed or facilitator is down, so **qualification
+  never depends on x402**.
 - **Chain I/O** — `packages/casper`: `casper-js-sdk` 5.0.12 for `recordAction`, `readState`,
   and `transferCspr`.
 
@@ -120,7 +122,7 @@ mock data. (Or run it locally — see [Run it yourself](#run-it-yourself).)
 - **Chain I/O:** `casper-js-sdk` 5.0.12
 - **Agents:** Claude via `@anthropic-ai/sdk` (model `claude-opus-4.8`), tool-based structured
   output, through the **DGrid** Anthropic-compatible gateway
-- **Payments:** custom HTTP 402 (x402) + native CSPR settlement
+- **Payments:** HTTP 402 (x402) with a live handshake to the official **Casper x402 facilitator** + native CSPR settlement
 - **Market data:** CoinGecko (free, live) — real ETH volatility + USDC peg, delivered over x402
 - **Frontend:** Next.js 15.5 (App Router) · Tailwind v3 · shadcn-style UI · Framer Motion
 
@@ -138,9 +140,12 @@ SentinelOS runs on the official [Casper AI Toolkit](https://www.casper.network/a
   can query and operate the TreasuryGuard contract through Casper's standardized tooling —
   `get_account_deploys`, `get_contract`, `get_account_info`, `get_account_ft_balances`, and 40+ more.
   Verified handshake: `CasperMcp v3.1.0`.
-- **x402** — HTTP-native micropayments. The demo settles via a real native-CSPR transfer as a
-  stand-in; the production path is the official **Casper x402 facilitator**
-  (`x402-facilitator.cspr.cloud`, sponsored txs), which we name as the next integration.
+- **x402** — HTTP-native micropayments. On every paid fetch the agent makes a **live,
+  authenticated call to the official Casper x402 facilitator** (`x402-facilitator.cspr.cloud`
+  `GET /supported`) to confirm the `exact` scheme + `casper:casper-test` network and read its
+  on-chain settlement `feePayer` — surfaced in the Crisis timeline. The value leg settles via a
+  real native-CSPR transfer today; `verifyPayment`/`settlePayment` (`packages/agents/src/x402/facilitator.ts`)
+  wire the facilitator's `/verify` + `/settle` for the full CEP-18 (WCSPR) + EIP-712 production path.
 - **AI Skills** — the signing/execution layer (`@sentinelos/casper`) mirrors the CSPR.build
   Agent Skills model.
 

@@ -1,5 +1,6 @@
 import { transferCspr } from '@sentinelos/casper';
-import { PREMIUM_DATA_URL, X402_MODE } from '../config.js';
+import { PREMIUM_DATA_URL, X402_MODE, X402_FACILITATOR_ENABLED } from '../config.js';
+import { resolveFacilitatorSupport, type FacilitatorSupport } from './facilitator.js';
 
 export interface VolatilityData {
   asset: string;
@@ -18,6 +19,8 @@ export interface X402Payment {
   payTo: string;
   txHash: string;
   explorerUrl?: string;
+  /** Present when the official hosted facilitator confirmed it settles this scheme+network. */
+  facilitator?: FacilitatorSupport | null;
 }
 
 export interface PremiumDataResult {
@@ -54,6 +57,22 @@ export async function fetchPremiumData(): Promise<PremiumDataResult> {
   if (!req) throw new Error('402 response missing paymentRequirements');
   logs.push(`402 Payment Required — ${req.maxAmountRequired} motes to ${req.payTo.slice(0, 12)}…`);
 
+  // Confirm the OFFICIAL hosted Casper x402 facilitator settles this scheme +
+  // network (authenticated /supported). Best-effort — the payment still settles
+  // if the facilitator is unreachable, so the loop never depends on it.
+  let facilitator: FacilitatorSupport | null = null;
+  if (X402_FACILITATOR_ENABLED) {
+    facilitator = await resolveFacilitatorSupport(req.network, req.scheme);
+    if (facilitator) {
+      logs.push(
+        `Casper x402 facilitator confirmed: ${facilitator.scheme} scheme on ${facilitator.network}` +
+          (facilitator.feePayer ? ` (settlement feePayer ${facilitator.feePayer.slice(0, 10)}…)` : ''),
+      );
+    } else {
+      logs.push('Casper x402 facilitator unavailable — settling directly.');
+    }
+  }
+
   let txHash: string;
   let explorerUrl: string | undefined;
   if (X402_MODE === 'live') {
@@ -79,7 +98,7 @@ export async function fetchPremiumData(): Promise<PremiumDataResult> {
   logs.push('Premium data unlocked.');
   return {
     data: (await retry.json()) as VolatilityData,
-    payment: { mode: X402_MODE, amountMotes: req.maxAmountRequired, payTo: req.payTo, txHash, explorerUrl },
+    payment: { mode: X402_MODE, amountMotes: req.maxAmountRequired, payTo: req.payTo, txHash, explorerUrl, facilitator },
     logs,
   };
 }

@@ -74,9 +74,12 @@ export async function runPipeline(
       volatility = premium.data;
       x402 = premium.payment;
       const paidVia = x402.mode === 'live' ? `live · ${x402.txHash}` : 'stub';
+      const viaFacilitator = x402.facilitator
+        ? `, verified via Casper x402 facilitator (${x402.facilitator.network})`
+        : '';
       push({
         agent: 'Treasury',
-        summary: `Bought premium volatility data via x402 (${paidVia}) — annualized vol ${(volatility.annualizedVol * 100).toFixed(0)}%, regime ${volatility.regime}`,
+        summary: `Bought premium volatility data via x402 (${paidVia})${viaFacilitator} — annualized vol ${(volatility.annualizedVol * 100).toFixed(0)}%, regime ${volatility.regime}`,
         detail: { x402, volatility, logs: premium.logs },
         at: now(),
       });

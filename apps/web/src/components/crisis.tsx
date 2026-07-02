@@ -323,6 +323,18 @@ export function Crisis() {
                 Paid {Number(result.x402.amountMotes).toLocaleString()} motes for the premium volatility
                 feed before deciding.
               </p>
+              {result.x402.facilitator && (
+                <div className="flex items-start gap-1.5 rounded-md border border-sky-500/25 bg-sky-500/5 px-2.5 py-1.5 text-xs text-sky-300">
+                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-sky-400" />
+                  <span>
+                    Verified against the official <span className="font-medium">Casper x402 facilitator</span> ·{' '}
+                    <span className="font-mono">{result.x402.facilitator.network}</span>
+                    {result.x402.facilitator.feePayer && (
+                      <> · feePayer <span className="font-mono">{result.x402.facilitator.feePayer.slice(0, 10)}…</span></>
+                    )}
+                  </span>
+                </div>
+              )}
               {result.x402.explorerUrl && (
                 <TxLink url={result.x402.explorerUrl} hash={result.x402.txHash} />
               )}

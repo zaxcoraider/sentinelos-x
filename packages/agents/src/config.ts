@@ -62,6 +62,19 @@ export const X402_MODE = (process.env.X402_MODE ?? 'stub') === 'live' ? 'live' :
 /** Whether Treasury fetches premium data before deciding. Off → pure Phase-4 path. */
 export const X402_ENABLED = (process.env.X402_ENABLED ?? 'true') !== 'false';
 
+// --- Official Casper x402 facilitator (make-software / CSPR.cloud) ---
+/** Base URL of the hosted x402 facilitator that verifies + settles payments. */
+export const FACILITATOR_URL = (
+  process.env.X402_FACILITATOR_URL ?? 'https://x402-facilitator.cspr.cloud'
+).replace(/\/$/, '');
+/** CSPR.cloud access token — authenticates every facilitator call. */
+export const FACILITATOR_API_KEY = process.env.CSPR_CLOUD_API_KEY ?? '';
+/**
+ * Confirm payment support against the real hosted facilitator during the x402
+ * handshake. On by default; set X402_FACILITATOR=off to skip the network call.
+ */
+export const X402_FACILITATOR_ENABLED = (process.env.X402_FACILITATOR ?? 'on') !== 'off';
+
 export function requireApiKey(): string {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) {
