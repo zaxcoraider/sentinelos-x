@@ -22,7 +22,7 @@ export default async function AgentsPage() {
         title="Agent Team"
         icon={Bot}
         tone="96, 165, 250"
-        subtitle="SentinelOS runs a team of autonomous agents on your protocol. Four are live and acting on Casper today; the rest ship in v1. Live agents act for real — nothing here is mocked."
+        subtitle="SentinelOS runs a team of 12 autonomous agents on your protocol — all live and acting on Casper today. Treasury and Governance execute on-chain; the rest add real data and analysis. Every agent anchors a verifiable record — nothing here is mocked."
       />
 
       <AgentRoster totalActions={totalActions} />
