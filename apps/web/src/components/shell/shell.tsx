@@ -97,8 +97,13 @@ function Brand() {
         <span className="absolute inset-0 rounded-xl ring-1 ring-white/15" />
       </div>
       <div className="leading-tight">
-        <div className="text-[15px] font-semibold tracking-tight">SentinelOS</div>
-        <div className="text-[11px] text-muted-foreground">Autonomous OS · Web3</div>
+        <div className="text-[16px] font-semibold tracking-tight text-white">
+          Sentinel
+          <span className="bg-gradient-to-r from-sky-400 to-ai bg-clip-text text-transparent">OS</span>
+        </div>
+        <div className="mt-0.5 text-[8px] font-medium uppercase tracking-[0.18em] text-muted-foreground/80">
+          Autonomous OS for Web3
+        </div>
       </div>
     </a>
   );
