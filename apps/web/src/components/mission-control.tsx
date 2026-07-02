@@ -63,8 +63,12 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
     setApproving(true);
     setApproveError(null);
     try {
-      const tx = await recordTreasuryAction();
-      setApprovedTx(tx);
+      const res = await recordTreasuryAction();
+      if (!res.ok) {
+        setApproveError(res.error);
+        return;
+      }
+      setApprovedTx({ txHash: res.txHash, explorerUrl: res.explorerUrl });
       for (let i = 0; i < 12; i++) {
         await new Promise((r) => setTimeout(r, 5000));
         try {

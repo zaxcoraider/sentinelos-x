@@ -43,10 +43,24 @@ export function readSecretKeyPem(): string {
   // CASPER_SECRET_KEY_PEM (raw, with literal \n allowed). Falls back to the
   // local file for dev.
   const b64 = process.env.CASPER_SECRET_KEY_B64;
-  if (b64) return Buffer.from(b64, 'base64').toString('utf8');
+  if (b64) {
+    const pem = Buffer.from(b64, 'base64').toString('utf8');
+    if (!pem.includes('PRIVATE KEY')) {
+      throw new Error('CASPER_SECRET_KEY_B64 did not decode to a PEM private key — re-run the base64 of keys/secret_key.pem (no wrapping/quotes).');
+    }
+    return pem;
+  }
   const raw = process.env.CASPER_SECRET_KEY_PEM;
   if (raw) return raw.includes('\\n') ? raw.replace(/\\n/g, '\n') : raw;
-  return readFileSync(SECRET_KEY_PATH, 'utf8');
+  try {
+    return readFileSync(SECRET_KEY_PATH, 'utf8');
+  } catch {
+    throw new Error(
+      'No signing key available. On a serverless host set CASPER_SECRET_KEY_B64 (base64 of keys/secret_key.pem); locally provide the key file at ' +
+        SECRET_KEY_PATH +
+        '.',
+    );
+  }
 }
 
 export function explorerTxUrl(hash: string): string {

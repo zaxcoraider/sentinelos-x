@@ -86,6 +86,7 @@ export function GovernanceCouncil() {
   const { phase, steps, result, error, running, trigger, seenAgents } = useCrisisStream();
   const [submitTx, setSubmitTx] = useState<TxInfo | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const risk = steps.find((s) => s.agent === 'Risk');
   const riskSeverity = risk?.detail?.severity as number | undefined;
@@ -101,11 +102,13 @@ export function GovernanceCouncil() {
   const submit = useCallback(async () => {
     if (!gov) return;
     setSubmitting(true);
+    setSubmitError(null);
     try {
-      const tx = await recordAction('governance', 'PROPOSAL', Math.round(result?.severity ?? riskSeverity ?? 80));
-      setSubmitTx(tx);
-    } catch {
-      /* stays on submit */
+      const res = await recordAction('governance', 'PROPOSAL', Math.round(result?.severity ?? riskSeverity ?? 80));
+      if (!res.ok) setSubmitError(res.error);
+      else setSubmitTx({ txHash: res.txHash, explorerUrl: res.explorerUrl });
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message : 'Failed to submit the motion');
     } finally {
       setSubmitting(false);
     }
@@ -244,6 +247,9 @@ export function GovernanceCouncil() {
                           {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                           {submitting ? 'Submitting…' : 'Submit motion on-chain'}
                         </Button>
+                      )}
+                      {submitError && (
+                        <p className="mt-2 text-xs text-danger">Submit failed: {submitError}</p>
                       )}
                     </div>
                   </div>
