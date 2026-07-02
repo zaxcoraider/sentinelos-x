@@ -1,5 +1,7 @@
+import { ShieldAlert } from 'lucide-react';
 import { readState, readRecentActions, explorerContractUrl, type OnChainAction } from '@sentinelos/casper';
 import { SecurityCenter, type AgentState } from '@/components/security-center';
+import { PageHeader } from '@/components/mc/page-header';
 
 // Reads live chain state — never cached.
 export const dynamic = 'force-dynamic';
@@ -28,13 +30,13 @@ export default async function SecurityPage() {
 
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-10">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Security Center</h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          Live threat radar over the on-chain TreasuryGuard contract — the sentinel&apos;s recorded
-          responses and current threat level, straight from Casper state.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Threat Monitoring"
+        title="Security Center"
+        icon={ShieldAlert}
+        tone="239, 68, 68"
+        subtitle="Live threat radar over the on-chain TreasuryGuard contract — the sentinel's recorded responses and current threat level, straight from Casper state."
+      />
 
       <SecurityCenter
         agents={agents}

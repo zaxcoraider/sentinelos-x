@@ -1,5 +1,7 @@
+import { Bot } from 'lucide-react';
 import { readState } from '@sentinelos/casper';
 import { AgentRoster } from '@/components/agent-roster';
+import { PageHeader } from '@/components/mc/page-header';
 
 // Reads live chain state — never cached.
 export const dynamic = 'force-dynamic';
@@ -15,13 +17,13 @@ export default async function AgentsPage() {
 
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Agent Team</h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          SentinelOS runs a team of autonomous agents on your protocol. Four are live and acting
-          on Casper today; the rest ship in v1. Live agents act for real — nothing here is mocked.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Agent Roster"
+        title="Agent Team"
+        icon={Bot}
+        tone="96, 165, 250"
+        subtitle="SentinelOS runs a team of autonomous agents on your protocol. Four are live and acting on Casper today; the rest ship in v1. Live agents act for real — nothing here is mocked."
+      />
 
       <AgentRoster totalActions={totalActions} />
     </main>

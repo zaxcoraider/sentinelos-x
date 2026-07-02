@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import type { TraceStep } from '@sentinelos/agents';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { IconTile, PanelCard } from '@/components/mc/panel';
 import { recordAction } from '@/app/governance-actions';
 import { useCrisisStream } from '@/hooks/use-crisis-stream';
 import { cn, shortHash } from '@/lib/utils';
@@ -59,8 +59,8 @@ function Bubble({
       className="flex gap-3"
     >
       <div
-        className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ring-1"
-        style={{ backgroundColor: '#0e1420', borderColor: seat.color }}
+        className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border"
+        style={{ backgroundColor: '#0e1420', borderColor: seat.color, boxShadow: `0 0 18px -6px ${seat.color}` }}
       >
         <Icon className="h-4.5 w-4.5" style={{ color: seat.color }} />
       </div>
@@ -116,12 +116,10 @@ export function GovernanceCouncil() {
   return (
     <div className="flex flex-col gap-6">
       {/* Council bench */}
-      <Card>
-        <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
+      <PanelCard hover={false}>
+        <div className="flex flex-wrap items-center justify-between gap-4 p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-ai/10 text-ai ring-1 ring-ai/30">
-              <Users className="h-5 w-5" />
-            </div>
+            <IconTile icon={Users} tone="167, 139, 250" size="lg" />
             <div>
               <div className="text-sm font-semibold">AI Governance Council</div>
               <div className="text-xs text-muted-foreground">
@@ -133,8 +131,8 @@ export function GovernanceCouncil() {
             {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Users className="h-4 w-4" />}
             {running ? 'Council deliberating…' : phase === 'done' ? 'Convene again' : 'Convene the council'}
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </PanelCard>
 
       {error && (
         <div className="rounded-md border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger">{error}</div>
@@ -204,8 +202,11 @@ export function GovernanceCouncil() {
           <AnimatePresence>
             {gov && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <Card className="border-primary/30 bg-primary/5">
-                  <CardContent className="p-5">
+                <PanelCard
+                  hover={false}
+                  className="border-primary/40"
+                >
+                  <div className="p-5" style={{ boxShadow: 'inset 0 0 60px -30px hsl(var(--primary))' }}>
                     <div className="flex items-center gap-2 text-primary">
                       <Compass className="h-4 w-4" />
                       <span className="text-sm font-semibold">Commander · consensus reached</span>
@@ -245,8 +246,8 @@ export function GovernanceCouncil() {
                         </Button>
                       )}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </PanelCard>
               </motion.div>
             )}
           </AnimatePresence>

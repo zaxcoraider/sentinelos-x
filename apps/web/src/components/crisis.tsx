@@ -21,7 +21,7 @@ import type {
   AgentRole,
 } from '@sentinelos/agents';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { IconTile, Panel, PanelCard } from '@/components/mc/panel';
 import { cn, shortHash } from '@/lib/utils';
 
 type Phase = 'idle' | 'running' | 'done' | 'error';
@@ -130,11 +130,12 @@ export function Crisis() {
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-10">
       {/* Page title */}
-      <header className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/10 text-red-400 ring-1 ring-red-500/30">
-          <Zap className="h-5 w-5" />
-        </div>
+      <header className="flex items-start gap-3.5">
+        <IconTile icon={Zap} tone="239, 68, 68" size="lg" />
         <div>
+          <div className="mb-1 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70">
+            Incident Response
+          </div>
           <h1 className="text-2xl font-semibold tracking-tight">Crisis Response</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             Autonomous depeg → detect · pay · decide · execute · recover
@@ -143,8 +144,8 @@ export function Crisis() {
       </header>
 
       {/* Peg health panel */}
-      <Card>
-        <CardContent className="flex flex-col gap-5 p-6">
+      <PanelCard hover={false}>
+        <div className="flex flex-col gap-5 p-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <div className="text-xs uppercase tracking-wide text-muted-foreground">USDC peg</div>
@@ -231,8 +232,8 @@ export function Crisis() {
               </label>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </PanelCard>
 
       {error && (
         <div className="rounded-md border border-red-500/30 bg-red-500/5 px-4 py-3 text-sm text-red-400">
@@ -307,24 +308,25 @@ export function Crisis() {
       <AnimatePresence>
         {result?.x402 && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <Card>
-              <CardContent className="flex flex-col gap-2 p-5">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
-                  x402 premium data
-                  <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase text-muted-foreground">
-                    {result.x402.mode}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Paid {Number(result.x402.amountMotes).toLocaleString()} motes for the premium volatility
-                  feed before deciding.
-                </p>
-                {result.x402.explorerUrl && (
-                  <TxLink url={result.x402.explorerUrl} hash={result.x402.txHash} />
-                )}
-              </CardContent>
-            </Card>
+            <Panel
+              title="x402 premium data"
+              icon={CreditCard}
+              tone="56, 189, 248"
+              right={
+                <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase text-muted-foreground">
+                  {result.x402.mode}
+                </span>
+              }
+              bodyClassName="flex flex-col gap-2 p-5"
+            >
+              <p className="text-sm text-muted-foreground">
+                Paid {Number(result.x402.amountMotes).toLocaleString()} motes for the premium volatility
+                feed before deciding.
+              </p>
+              {result.x402.explorerUrl && (
+                <TxLink url={result.x402.explorerUrl} hash={result.x402.txHash} />
+              )}
+            </Panel>
           </motion.div>
         )}
       </AnimatePresence>
@@ -332,39 +334,38 @@ export function Crisis() {
       <AnimatePresence>
         {result?.governance && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <Card>
-              <CardContent className="flex flex-col gap-3 p-5">
-                <div className="flex items-center gap-2 text-sm font-semibold text-violet-400">
-                  <Landmark className="h-4 w-4" />
-                  Emergency proposal
+            <Panel
+              title="Emergency proposal"
+              icon={Landmark}
+              tone="167, 139, 250"
+              bodyClassName="flex flex-col gap-3 p-5"
+            >
+              <div>
+                <div className="text-base font-semibold">{result.governance.title}</div>
+                <p className="mt-1 text-sm text-muted-foreground">{result.governance.summary}</p>
+              </div>
+              {result.governance.parameterChanges.length > 0 && (
+                <ul className="flex flex-col gap-1 text-sm text-foreground/90">
+                  {result.governance.parameterChanges.map((c, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="text-violet-400">›</span>
+                      {c}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                <span>Action: <span className="font-mono text-foreground">{result.governance.action}</span></span>
+                <span>Quorum: <span className="text-foreground">{result.governance.quorumPercent}%</span></span>
+                <span>Window: <span className="text-foreground">{result.governance.votingWindowHours}h</span></span>
+              </div>
+              {result.governanceTx && (
+                <div className="border-t border-border pt-2">
+                  <span className="text-xs text-muted-foreground">Anchored on Casper · </span>
+                  <TxLink url={result.governanceTx.explorerUrl} hash={result.governanceTx.txHash} />
                 </div>
-                <div>
-                  <div className="text-base font-semibold">{result.governance.title}</div>
-                  <p className="mt-1 text-sm text-muted-foreground">{result.governance.summary}</p>
-                </div>
-                {result.governance.parameterChanges.length > 0 && (
-                  <ul className="flex flex-col gap-1 text-sm text-foreground/90">
-                    {result.governance.parameterChanges.map((c, i) => (
-                      <li key={i} className="flex gap-2">
-                        <span className="text-violet-400">›</span>
-                        {c}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                  <span>Action: <span className="font-mono text-foreground">{result.governance.action}</span></span>
-                  <span>Quorum: <span className="text-foreground">{result.governance.quorumPercent}%</span></span>
-                  <span>Window: <span className="text-foreground">{result.governance.votingWindowHours}h</span></span>
-                </div>
-                {result.governanceTx && (
-                  <div className="border-t border-border pt-2">
-                    <span className="text-xs text-muted-foreground">Anchored on Casper · </span>
-                    <TxLink url={result.governanceTx.explorerUrl} hash={result.governanceTx.txHash} />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              )}
+            </Panel>
           </motion.div>
         )}
       </AnimatePresence>
