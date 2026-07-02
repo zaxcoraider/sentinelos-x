@@ -1,8 +1,8 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Loader2, ShieldCheck, ArrowUpRight, Check, X, Coins } from 'lucide-react';
-import type { PipelineResult } from '@sentinelos/agents';
+import type { GovernanceProposal, TreasuryDecision } from '@sentinelos/agents';
 import { Button } from '@/components/ui/button';
 import { Donut, MeterBar } from './primitives';
 import { Magnetic } from './magnetic';
@@ -14,7 +14,8 @@ interface TxInfo {
 }
 
 export function TreasuryRecommendation({
-  result,
+  decision,
+  gov,
   onApprove,
   onReject,
   approving,
@@ -22,7 +23,8 @@ export function TreasuryRecommendation({
   approveError,
   dismissed,
 }: {
-  result: PipelineResult | null;
+  decision: TreasuryDecision | null;
+  gov: GovernanceProposal | null;
   onApprove: () => void;
   onReject: () => void;
   approving: boolean;
@@ -30,9 +32,6 @@ export function TreasuryRecommendation({
   approveError: string | null;
   dismissed: boolean;
 }) {
-  const decision = result?.decision ?? null;
-  const gov = result?.governance ?? null;
-
   if (!decision || dismissed) {
     return (
       <div className="flex h-full min-h-[200px] flex-col items-center justify-center gap-2 p-6 text-center">

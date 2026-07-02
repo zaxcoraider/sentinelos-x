@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Loader2, Network, Cpu, Radar, Receipt, Radio, Coins } from 'lucide-react';
-import type { TraceStep } from '@sentinelos/agents';
+import type { TraceStep, TreasuryDecision, GovernanceProposal } from '@sentinelos/agents';
 import { Button } from '@/components/ui/button';
 import { fetchState, recordTreasuryAction } from '@/app/actions';
 import { useCrisisStream } from '@/hooks/use-crisis-stream';
@@ -31,6 +31,25 @@ function severityFromSteps(steps: TraceStep[]): number | null {
   return typeof v === 'number' ? v : null;
 }
 
+/** Pull the Treasury decision out of the live stream so the human gate appears
+ *  as soon as Treasury decides — without waiting for the whole pipeline (which
+ *  can exceed a serverless timeout before it emits the final result). */
+function decisionFromSteps(steps: TraceStep[]): TreasuryDecision | null {
+  const d = steps
+    .map((s) => s.detail)
+    .find(
+      (x) => x && typeof x.action === 'string' && typeof x.confidence === 'number' && typeof x.expectedSavingsUsd === 'number',
+    );
+  return d ? (d as unknown as TreasuryDecision) : null;
+}
+
+function governanceFromSteps(steps: TraceStep[]): GovernanceProposal | null {
+  const g = steps
+    .map((s) => s.detail)
+    .find((x) => x && typeof x.title === 'string' && typeof x.quorumPercent === 'number');
+  return g ? (g as unknown as GovernanceProposal) : null;
+}
+
 export function MissionControl({ initialTotalActions }: { initialTotalActions: number | null }) {
   const { phase, steps, result, error, activeAgent, seenAgents, running, trigger } = useCrisisStream();
   const [totalActions, setTotalActions] = useState<number | null>(initialTotalActions);
@@ -45,7 +64,11 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
     return null;
   }, [running, phase, result, steps]);
 
-  const protectedUsd = result?.decision ? Math.round(result.decision.expectedSavingsUsd) : 0;
+  // Prefer the streamed step so the recommendation appears mid-run; fall back to
+  // the final result once the pipeline completes.
+  const decision = result?.decision ?? decisionFromSteps(steps);
+  const gov = result?.governance ?? governanceFromSteps(steps);
+  const protectedUsd = decision ? Math.round(decision.expectedSavingsUsd) : 0;
 
   const onTrigger = useCallback(() => {
     setApprovedTx(null);
@@ -181,7 +204,8 @@ export function MissionControl({ initialTotalActions }: { initialTotalActions: n
 
         <Panel title="Treasury Agent Recommendation" icon={Coins} tone="34, 197, 94" className="min-h-[220px]">
           <TreasuryRecommendation
-            result={result}
+            decision={decision}
+            gov={gov}
             onApprove={onApprove}
             onReject={onReject}
             approving={approving}
