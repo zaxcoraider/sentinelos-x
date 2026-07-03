@@ -1,4 +1,4 @@
-import { transferCspr } from '@sentinelos/casper';
+import { transferCspr, PUBLIC_KEY_HEX } from '@sentinelos/casper';
 import { PREMIUM_DATA_URL, X402_MODE, X402_FACILITATOR_ENABLED } from '../config.js';
 import { resolveFacilitatorSupport, type FacilitatorSupport } from './facilitator.js';
 
@@ -75,15 +75,32 @@ export async function fetchPremiumData(): Promise<PremiumDataResult> {
 
   let txHash: string;
   let explorerUrl: string | undefined;
-  if (X402_MODE === 'live') {
+  const stubSettle = (reason: string): string => {
+    const h = `stub-${Date.now().toString(16)}`;
+    logs.push(`${reason} — ${h}`);
+    return h;
+  };
+  // The feed's default payTo is our OWN key (self-settlement demo). Casper's mint
+  // rejects a transfer to the same purse ("Invalid purse") and still burns gas, so
+  // never attempt a real self-transfer — settle it as a stub. Set X402_PAY_TO to a
+  // distinct account to get a real on-chain settlement.
+  const isSelfPay = !!PUBLIC_KEY_HEX && req.payTo.toLowerCase() === PUBLIC_KEY_HEX.toLowerCase();
+  if (X402_MODE === 'live' && !isSelfPay) {
     logs.push('Settling on Casper (native CSPR transfer)…');
-    const settle = await transferCspr(req.maxAmountRequired, { targetPublicKeyHex: req.payTo });
-    txHash = settle.txHash;
-    explorerUrl = settle.explorerUrl;
-    logs.push(`Settled on-chain — ${txHash}`);
+    try {
+      const settle = await transferCspr(req.maxAmountRequired, { targetPublicKeyHex: req.payTo });
+      txHash = settle.txHash;
+      explorerUrl = settle.explorerUrl;
+      logs.push(`Settled on-chain — ${txHash}`);
+    } catch (err) {
+      // Fail-soft: a settlement failure must not abort the whole x402 fetch — keep
+      // the real premium data and fall back to a stub hash.
+      txHash = stubSettle(`Settlement failed (${err instanceof Error ? err.message : 'error'}) — stub settlement`);
+    }
+  } else if (X402_MODE === 'live') {
+    txHash = stubSettle('Self-payee — skipping self-transfer, stub settlement (set X402_PAY_TO for a real one)');
   } else {
-    txHash = `stub-${Date.now().toString(16)}`;
-    logs.push(`Stub settlement (no chain spend) — ${txHash}`);
+    txHash = stubSettle('Stub settlement (no chain spend)');
   }
 
   const proof = {
