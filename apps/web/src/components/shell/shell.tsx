@@ -14,7 +14,7 @@ import {
   Store,
   Settings,
   Bell,
-  ChevronDown,
+  ExternalLink,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -256,11 +256,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="lg:hidden">
             <Brand />
           </div>
-          <div className="hidden items-center gap-2 rounded-full border border-border bg-card-elevated/50 px-3 py-1.5 font-mono text-xs text-muted-foreground lg:flex">
+          <a
+            href="https://testnet.cspr.live/contract-package/7f56caa1d89d394786354bc382b1896fcd21fd77d0cea33c41a54e28c56990db"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="View the TreasuryGuard contract on cspr.live"
+            className="group hidden items-center gap-2 rounded-full border border-border bg-card-elevated/50 px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground lg:flex"
+          >
             <span className="text-muted-foreground/70">Protocol:</span>
             <span className="font-semibold text-foreground/90">TreasuryGuard</span>
-            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground/60" />
-          </div>
+            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground/60 transition-colors group-hover:text-primary" />
+          </a>
           <div className="flex items-center gap-3">
             <Connection compact />
             <NotificationsBell />
