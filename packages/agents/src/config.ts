@@ -69,12 +69,16 @@ export const ROUTE_THRESHOLD = Number(process.env.AGENT_ROUTE_THRESHOLD ?? 60);
  * URL of the x402-gated premium feed. Local dev → the standalone
  * services/premium-data server; on Vercel → the deployment's own /api/premium
  * route (no standalone server on serverless). Overridable via PREMIUM_DATA_URL.
+ *
+ * Prefer VERCEL_PROJECT_PRODUCTION_URL (the stable, public production domain)
+ * over VERCEL_URL: the latter is the deployment-specific host, which — when
+ * deployment protection is on — answers self-fetches with an HTML SSO page,
+ * breaking the x402 handshake (JSON parse of "<!DOCTYPE ...").
  */
+const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
 export const PREMIUM_DATA_URL =
   process.env.PREMIUM_DATA_URL ??
-  (process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/api/premium`
-    : 'http://localhost:4021/volatility');
+  (vercelHost ? `https://${vercelHost}/api/premium` : 'http://localhost:4021/volatility');
 /** stub = no on-chain settlement (demo-safe); live = real CSPR transfer. */
 export const X402_MODE = (process.env.X402_MODE ?? 'stub') === 'live' ? 'live' : 'stub';
 /** Whether Treasury fetches premium data before deciding. Off → pure Phase-4 path. */
