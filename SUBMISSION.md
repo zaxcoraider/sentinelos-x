@@ -60,9 +60,14 @@ on-chain event feed), Odra, live handshake to the official **Casper x402 facilit
 - x402 settlement (via Casper facilitator) — https://testnet.cspr.live/transaction/f82bbf7f76caff29b613ed21dca3ac76ab9ed63e928da9f66f73f9f196374c6d
 - **All 12 agent records** (Risk, Analytics, Commander, Compliance, Liquidity, Insurance, Growth, Community, Legal + the above) are listed in the README's on-chain-proof table.
 
-**What's next (v1):** an agent **marketplace + Developer SDK** (publish/install agents), a full
-token-weighted Governance vote, and multi-protocol coverage — turning the 12-agent team into an
-open platform any protocol installs.
+**What's next (every step extends something already live). Next (v1):** an agent **marketplace +
+Developer SDK** (publish/install agents like extensions), **multi-protocol coverage** (any protocol
+installs the team), full **token-weighted governance** (voting + timelocks + auto-execution), and a
+**configurable autonomy dial** (auto-execute under a risk threshold, human-gate above). **The
+vision:** **provable AI operations** — a tamper-proof on-chain record of *why* every action was
+taken, which only a Casper-native OS can promise — an **x402 data/compute economy** where agents buy
+their own data (full WCSPR + EIP-712 settle), and agents that *act* (hedge, provide liquidity, pay
+insurance), all driveable over a public **MCP** surface.
 
 ---
 

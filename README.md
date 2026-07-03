@@ -208,6 +208,32 @@ flowchart TD
 
 ---
 
+## 🚀 Roadmap — from a 12-agent team to an OS
+
+Everything below extends something already live in this repo — not a wishlist.
+
+**Next (v1)**
+- **Agent Marketplace + Developer SDK** — publish an agent, install it like a VS Code
+  extension; protocols run it, authors earn. *(Extends today's shared 12-agent runtime + on-chain anchor.)*
+- **Multi-protocol coverage** — point SentinelOS at any protocol's treasury or positions;
+  one control plane, many protocols. *(Extends the live `TreasuryGuard` contract.)*
+- **Full on-chain governance** — token-weighted voting, timelocks, auto-execution of what
+  passes. *(Today Governance drafts + anchors the proposal.)*
+- **Configurable autonomy** — a policy dial that auto-executes under a risk threshold and
+  human-gates above it. *(Today a human approves every action.)*
+
+**The vision**
+- **Provable AI operations** — a tamper-proof, on-chain record of *why* every autonomous
+  action was taken. Only a Casper-native OS can promise this. *(Today all 12 agents anchor `record_action`.)*
+- **An x402 data & compute economy** — agents autonomously buy data + compute over x402,
+  full CEP-18 (WCSPR) + EIP-712 settlement. *(Today a real paid feed via the official Casper facilitator.)*
+- **Agents that act, not just advise** — hedging, liquidity provisioning, insurance payouts
+  via more contract entry points. *(Today Treasury executes a real REBALANCE.)*
+- **A public MCP surface** — any external agent, or a human via Claude, drives SentinelOS
+  through MCP. *(Today the official Casper MCP server is wired in.)*
+
+---
+
 ## 🧩 Casper AI Toolkit — the sponsor stack we build on
 
 SentinelOS runs on the official [Casper AI Toolkit](https://www.casper.network/ai):
