@@ -1,11 +1,12 @@
 # SentinelOS X — Submission Kit
 
-Everything needed to submit to the **Casper Agentic Buildathon 2026** (Agentic AI track):
-DoraHacks form answers, a 3-minute video script, and a demo checklist.
+The judge-facing answers for the **Casper Agentic Buildathon 2026** (Agentic AI track) —
+copy these into the DoraHacks form. (The video script + recording checklist live in the
+local, gitignored `SUBMISSION_NOTES.md`.)
 
 ---
 
-## 1. DoraHacks form answers
+## DoraHacks form answers
 
 **Project name:** SentinelOS X
 
@@ -71,52 +72,4 @@ insurance), all driveable over a public **MCP** surface.
 
 ---
 
-## 2. Three-minute video script
-
-> Screen-record the dashboard at `npm run dev`. Have the premium-data feed running so the
-> live x402 leg fires. Keep a cspr.live tab ready.
-
-**0:00–0:25 — The hook (Mission Control)**
-> "Most Web3 AI answers questions. SentinelOS *runs the protocol*."
-Show Mission Control: the 12-node live agent network, Protocol Health 100%, Agents 12/12, real
-on-chain tx count, and the **Live Market bar monitoring real USDC ($0.9996, peg holding · CoinGecko)**.
-"Twelve AI agents, live, running a real treasury on Casper — with real market data."
-
-**0:25–0:50 — The team (Agent Team)**
-Click **Agent Team**. "Twelve agents — all live, all acting on-chain. Treasury and Governance
-take protocol actions; the other ten add real data and analysis — and every one anchors a
-verifiable record to Casper. We never fake it."
-
-**0:50–2:05 — The crisis — the wow moment**
-On Mission Control, click **Trigger incident** (a USDC depeg stress drill). Narrate as the
-agent graph lights up and the trace streams:
-> "A 7% USDC depeg drill hits. **Risk** scores it high — read the score off screen. **Commander**
-> routes it and wakes Treasury. **Treasury** pays for **real market data over x402** — a real CSPR
-> settlement, here's the hash — then recommends REBALANCE, protecting the amount shown. I **approve**
-> — that fires the real on-chain record. **Governance** reaches consensus on an emergency proposal."
-Health recovers, threat returns to LOW. "All of that, in seconds — a human only approves."
-
-> ⚠️ The severity score and USD-protected figure are generated live by the agents and vary every
-> run, so don't hard-code numbers in narration — glance at the on-screen values (or re-run until
-> you get a take you like). Only the peg reading and tx hashes are fixed/real.
-
-**2:05–2:35 — Proof (cspr.live)**
-Click a tx hash. Show the transaction on cspr.live. "Every action is a verifiable Casper
-transaction — the settlement, the treasury action, the governance proposal."
-
-**2:35–3:00 — The vision**
-Back to Agent Team / Security Center. "Today: twelve agents, x402, an on-chain contract, and a
-live dashboard — all shipping real Casper transactions. Tomorrow: the full agent OS and a
-marketplace where any protocol installs the agents it needs. SentinelOS — the autonomous OS for Web3."
-
----
-
-## 3. Demo capture checklist
-
-- [ ] `npm run start --workspace @sentinelos/premium-data` (x402 feed on :4021)
-- [ ] `npm run dev --workspace @sentinelos/web` (dashboard on :3000)
-- [ ] Funded testnet key present at `keys/secret_key.pem`; `.env` has DGrid/LLM config + balance
-- [ ] Walk Mission Control → Agent Team → Crisis (trigger the depeg, let it stream) → Governance Council → Security Center
-- [ ] Click through at least one tx hash to cspr.live on camera
-- [ ] Record ≤ 3 min; upload; paste the link into the DoraHacks form and the README
-```
+*Video script + recording checklist: see the local, gitignored `SUBMISSION_NOTES.md`.*
