@@ -96,9 +96,9 @@ Click a tx hash. Show the transaction on cspr.live. "Every action is a verifiabl
 transaction — the settlement, the treasury action, the governance proposal."
 
 **2:35–3:00 — The vision**
-Back to Agent Team / Security Center. "Today: four agents, x402, an on-chain contract, a live
-dashboard. Tomorrow: the full agent OS and a marketplace where any protocol installs the
-agents it needs. SentinelOS — the autonomous OS for Web3."
+Back to Agent Team / Security Center. "Today: twelve agents, x402, an on-chain contract, and a
+live dashboard — all shipping real Casper transactions. Tomorrow: the full agent OS and a
+marketplace where any protocol installs the agents it needs. SentinelOS — the autonomous OS for Web3."
 
 ---
 
