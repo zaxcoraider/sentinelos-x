@@ -85,11 +85,15 @@ verifiable record to Casper. We never fake it."
 **0:50–2:05 — The crisis — the wow moment**
 On Mission Control, click **Trigger incident** (a USDC depeg stress drill). Narrate as the
 agent graph lights up and the trace streams:
-> "A 7% USDC depeg drill hits. **Risk** scores it 82 out of 100. **Commander** routes it and
-> wakes Treasury. **Treasury** pays for **real market data over x402** — a real CSPR settlement,
-> here's the hash — then recommends REBALANCE, ~$4.2M protected. I **approve** — that fires the
-> real on-chain record. **Governance** reaches consensus on an emergency proposal."
+> "A 7% USDC depeg drill hits. **Risk** scores it high — read the score off screen. **Commander**
+> routes it and wakes Treasury. **Treasury** pays for **real market data over x402** — a real CSPR
+> settlement, here's the hash — then recommends REBALANCE, protecting the amount shown. I **approve**
+> — that fires the real on-chain record. **Governance** reaches consensus on an emergency proposal."
 Health recovers, threat returns to LOW. "All of that, in seconds — a human only approves."
+
+> ⚠️ The severity score and USD-protected figure are generated live by the agents and vary every
+> run, so don't hard-code numbers in narration — glance at the on-screen values (or re-run until
+> you get a take you like). Only the peg reading and tx hashes are fixed/real.
 
 **2:05–2:35 — Proof (cspr.live)**
 Click a tx hash. Show the transaction on cspr.live. "Every action is a verifiable Casper
