@@ -52,7 +52,7 @@ on-chain event feed), Odra, live handshake to the official **Casper x402 facilit
 **Links:**
 - Repo: https://github.com/zaxcoraider/sentinelos-x
 - Contract package: https://testnet.cspr.live/contract-package/7f56caa1d89d394786354bc382b1896fcd21fd77d0cea33c41a54e28c56990db
-- Demo video: `<add link>`
+- Demo video: https://youtu.be/kM4nOijX2M4
 
 **Verifiable on-chain (one live incident — 12 agents, 12 transactions, `total_actions` 8→20):**
 - Treasury `REBALANCE` — https://testnet.cspr.live/transaction/558753bf1aa084563dad75bbd978db914be112a505fc21b70d116c67b4875161

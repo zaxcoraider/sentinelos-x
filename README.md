@@ -15,6 +15,7 @@ on-chain transaction.
 <br/>
 
 [![Live Demo](https://img.shields.io/badge/▶%20LIVE%20DEMO-sentinelos--x--web.vercel.app-2563EB?style=for-the-badge&logo=vercel&logoColor=white)](https://sentinelos-x-web.vercel.app/)
+[![Watch the demo](https://img.shields.io/badge/▶%20WATCH-Demo%20video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/kM4nOijX2M4)
 [![Casper 2.0](https://img.shields.io/badge/Built%20on-Casper%202.0-FF0012?style=for-the-badge)](https://casper.network)
 [![Buildathon 2026](https://img.shields.io/badge/Agentic%20Buildathon-2026-8B5CF6?style=for-the-badge)](https://dorahacks.io/hackathon/casper-agentic-buildathon)
 
@@ -26,7 +27,7 @@ on-chain transaction.
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=nextdotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 
-**[▶ Try the live demo](https://sentinelos-x-web.vercel.app/)** &nbsp;·&nbsp; [On-chain proof](#-on-chain-proof--one-incident-12-transactions) &nbsp;·&nbsp; [Architecture](#-architecture) &nbsp;·&nbsp; [Run it yourself](#-run-it-yourself)
+**[▶ Try the live demo](https://sentinelos-x-web.vercel.app/)** &nbsp;·&nbsp; [▶ Watch the video](https://youtu.be/kM4nOijX2M4) &nbsp;·&nbsp; [On-chain proof](#-on-chain-proof--one-incident-12-transactions) &nbsp;·&nbsp; [Architecture](#-architecture) &nbsp;·&nbsp; [Run it yourself](#-run-it-yourself)
 
 </div>
 
@@ -313,6 +314,6 @@ Deploy the dashboard: see [`DEPLOY.md`](DEPLOY.md).
 
 **SentinelOS** — AI agents. On-chain. Always on.
 
-[▶ Live Demo](https://sentinelos-x-web.vercel.app/) &nbsp;·&nbsp; [GitHub](https://github.com/zaxcoraider/sentinelos-x) &nbsp;·&nbsp; Casper Agentic Buildathon 2026
+[▶ Live Demo](https://sentinelos-x-web.vercel.app/) &nbsp;·&nbsp; [▶ Video](https://youtu.be/kM4nOijX2M4) &nbsp;·&nbsp; [GitHub](https://github.com/zaxcoraider/sentinelos-x) &nbsp;·&nbsp; Casper Agentic Buildathon 2026
 
 </div>
