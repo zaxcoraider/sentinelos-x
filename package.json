@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "SentinelOS X — autonomous treasury sentinel on Casper",
+  "license": "MIT",
   "workspaces": [
     "packages/*",
     "apps/*",

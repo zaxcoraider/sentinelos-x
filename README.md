@@ -26,8 +26,9 @@ on-chain transaction.
 ![Claude](https://img.shields.io/badge/Claude-Opus%204.8-D97757?logo=anthropic&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=nextdotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-22C55E)
 
-**[▶ Try the live demo](https://sentinelos-x-web.vercel.app/)** &nbsp;·&nbsp; [▶ Watch the video](https://youtu.be/kM4nOijX2M4) &nbsp;·&nbsp; [On-chain proof](#-on-chain-proof--one-incident-12-transactions) &nbsp;·&nbsp; [Architecture](#-architecture) &nbsp;·&nbsp; [Run it yourself](#-run-it-yourself)
+**[▶ Try the live demo](https://sentinelos-x-web.vercel.app/)** &nbsp;·&nbsp; [▶ Watch the video](https://youtu.be/kM4nOijX2M4) &nbsp;·&nbsp; [On-chain proof](#-on-chain-proof--every-agent-anchors-its-action) &nbsp;·&nbsp; [Architecture](#-architecture) &nbsp;·&nbsp; [Run it yourself](#-run-it-yourself)
 
 </div>
 
@@ -37,9 +38,10 @@ Built for the **Casper Agentic Buildathon 2026** (Agentic AI track) on **Casper 
 (Rust → WASM via [Odra](https://odra.dev)). Not EVM, not Solana.
 
 > **Live today:** a full **12-agent team** — each one anchors its own action to the on-chain
-> `TreasuryGuard` contract during an incident · **x402** payments over the official Casper
-> facilitator · a multi-page dashboard. **One incident → ~12 verifiable transactions** on
-> [cspr.live](https://testnet.cspr.live).
+> `TreasuryGuard` contract during an incident, and **gets paid real SOSC for it** over the
+> official Casper x402 facilitator · a multi-page dashboard. **One incident → ~24 verifiable
+> transactions** (12 agent anchors + 11 agent-to-agent payments + the premium-data payment) on
+> [cspr.live](https://testnet.cspr.live) — confirmed 12/12 + 11/11 from the production app.
 
 ---
 
@@ -69,7 +71,7 @@ with zero human keystrokes, captured from a live run:
 ⚖️🌊🛟🌱📣📜  Compliance · Liquidity · Insurance · Growth · Community · Legal
                 → six domain agents weigh in (Claude), each anchored on-chain
 🏛  Governance  → drafts an emergency proposal, anchors it for the DAO
-                → 12 agents · ~12 verifiable Casper transactions · one incident
+                → 12 agents · ~24 verifiable Casper transactions · one incident
 ```
 
 > **Honesty:** the USDC price/volatility the agents read is **real and live** (CoinGecko); the
@@ -78,7 +80,7 @@ with zero human keystrokes, captured from a live run:
 
 ---
 
-## 🔗 On-chain proof — one incident, 12 transactions
+## 🔗 On-chain proof — every agent anchors its action
 
 From a single live run (`total_actions` went **8 → 20** on the contract), **every agent anchored
 its own action** on Casper Testnet:
@@ -174,6 +176,7 @@ flowchart TD
     ADV -. reason .-> LLM
     DATA -- buy data --> FEED
     FEED -. pay via .-> FAC
+    CMD -- "payroll · SOSC fee per agent" --> FAC
     CORE == record_action ==> SC
     DATA == record_action ==> SC
     ADV == record_action ==> SC
@@ -232,7 +235,8 @@ flowchart TD
 
 > **Honest split:** Treasury + Governance take protocol **actions**; the other ten contribute real
 > **data/analysis** (Oracle + Analytics deterministic over live data; the six advisory agents are
-> real Claude reasoning). Every one anchors a verifiable `record_action`.
+> real Claude reasoning). Every one anchors a verifiable `record_action` — and every specialist
+> **gets paid a real SOSC fee** into its own wallet by the Commander, per incident.
 
 ### Product modules
 
@@ -354,6 +358,12 @@ Deploy the dashboard: see [`DEPLOY.md`](DEPLOY.md).
    if the feed or facilitator is down.
 3. **Every "real" artifact links to cspr.live** — the agent trace, the x402 settlement, and each
    `record_action` shows a verifiable transaction hash.
+
+---
+
+## 📄 License
+
+[MIT](LICENSE) © 2026 zaxcoraider
 
 ---
 
