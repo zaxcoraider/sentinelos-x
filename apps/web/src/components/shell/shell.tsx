@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -15,10 +15,13 @@ import {
   Settings,
   Bell,
   ExternalLink,
+  ArrowUpRight,
   type LucideIcon,
 } from 'lucide-react';
+import type { OnChainAction } from '@sentinelos/casper';
 import { cn } from '@/lib/utils';
 import { Sparkline } from '@/components/mc/primitives';
+import { AGENT_META } from '@/components/mc/agent-meta';
 
 interface NavItem {
   label: string;
@@ -137,33 +140,105 @@ function Connection({ compact }: { compact?: boolean }) {
   );
 }
 
-// Genuine, always-true system-status items — no fabricated alerts. Surfaced in
-// the header bell so it's a real, working control rather than a dead icon.
-const NOTIFICATIONS: { icon: LucideIcon; tone: string; title: string; desc: string }[] = [
-  { icon: Bot, tone: 'text-success', title: 'All 12 agents online', desc: 'Sentinel team operational' },
-  { icon: Landmark, tone: 'text-primary', title: 'TreasuryGuard contract live', desc: 'Deployed on Casper Testnet' },
-  { icon: Network, tone: 'text-success', title: 'Chain state synced', desc: 'Reading live on-chain data' },
-  { icon: ShieldAlert, tone: 'text-ai', title: 'Autonomous monitoring active', desc: 'USDC peg under watch' },
-];
+/* ---- Real notifications ------------------------------------------------
+ * The bell surfaces the actual latest record_action transactions on
+ * TreasuryGuard (indexed by CSPR.cloud, each row links to cspr.live) plus the
+ * live USDC peg reading. The unread badge counts only events newer than the
+ * last time the panel was opened (persisted in localStorage). */
+
+const SEEN_KEY = 'sentinelos-notifications-seen-at';
+
+interface PegStatus {
+  symbol: string;
+  price: number;
+  pegDeviation: number;
+}
+
+function timeAgo(iso: string) {
+  const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return new Date(iso).toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+function agentMeta(agent: string) {
+  const key = (agent.charAt(0).toUpperCase() + agent.slice(1).toLowerCase()) as keyof typeof AGENT_META;
+  return AGENT_META[key];
+}
 
 function NotificationsBell() {
   const [open, setOpen] = useState(false);
+  const [actions, setActions] = useState<OnChainAction[] | null>(null);
+  const [peg, setPeg] = useState<PegStatus | null>(null);
+  const [seenAt, setSeenAt] = useState(0);
+
+  useEffect(() => {
+    setSeenAt(Number(localStorage.getItem(SEEN_KEY) ?? 0));
+    let alive = true;
+    const load = async () => {
+      try {
+        const res = await fetch('/api/activity', { cache: 'no-store' });
+        if (res.ok) {
+          const json = (await res.json()) as { actions?: OnChainAction[] };
+          if (alive) setActions(json.actions ?? []);
+        } else if (alive) {
+          setActions((a) => a ?? []);
+        }
+      } catch {
+        if (alive) setActions((a) => a ?? []);
+      }
+      try {
+        const res = await fetch('/api/market', { cache: 'no-store' });
+        if (res.ok) {
+          const json = (await res.json()) as { stable?: PegStatus };
+          if (alive && json.stable) setPeg(json.stable);
+        }
+      } catch {
+        // peg pill simply stays hidden when the market feed is down
+      }
+    };
+    load();
+    const id = setInterval(load, 60_000);
+    return () => {
+      alive = false;
+      clearInterval(id);
+    };
+  }, []);
+
+  const unread = (actions ?? []).filter((a) => new Date(a.timestamp).getTime() > seenAt).length;
+  const pegged = peg ? peg.pegDeviation < 0.005 : null;
+
+  const toggle = () => {
+    setOpen((o) => {
+      const next = !o;
+      if (next && actions && actions.length > 0) {
+        const newest = Math.max(...actions.map((a) => new Date(a.timestamp).getTime()));
+        localStorage.setItem(SEEN_KEY, String(newest));
+        setSeenAt(newest);
+      }
+      return next;
+    });
+  };
+
   return (
     <div className="relative">
       <button
         type="button"
-        aria-label="Notifications"
+        aria-label={unread > 0 ? `Notifications — ${unread} new on-chain events` : 'Notifications'}
         aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggle}
         className={cn(
           'relative flex h-8 w-8 items-center justify-center rounded-full border bg-card-elevated/50 transition-colors',
           open ? 'border-primary/50 text-foreground' : 'border-border text-muted-foreground hover:text-foreground',
         )}
       >
         <Bell className="h-4 w-4" />
-        <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-semibold text-white shadow-[0_0_6px_hsl(var(--primary))]">
-          {NOTIFICATIONS.length}
-        </span>
+        {unread > 0 && (
+          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-semibold text-white shadow-[0_0_6px_hsl(var(--primary))]">
+            {unread > 9 ? '9+' : unread}
+          </span>
+        )}
       </button>
       <AnimatePresence>
         {open && (
@@ -175,29 +250,71 @@ function NotificationsBell() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.98 }}
               transition={{ duration: 0.14 }}
-              className="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-border bg-card/95 shadow-xl backdrop-blur-xl"
+              className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border border-border bg-card/95 shadow-xl backdrop-blur-xl"
             >
               <div className="flex items-center justify-between border-b border-border/70 px-3 py-2">
-                <span className="text-xs font-semibold text-foreground">Notifications</span>
-                <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-success">
-                  <span className="h-1.5 w-1.5 rounded-full bg-success" />
-                  All systems nominal
-                </span>
+                <span className="text-xs font-semibold text-foreground">On-chain activity</span>
+                {peg && pegged !== null && (
+                  <span
+                    className={cn(
+                      'flex items-center gap-1.5 text-[10px] uppercase tracking-wider',
+                      pegged ? 'text-success' : 'text-warning',
+                    )}
+                  >
+                    <span className={cn('h-1.5 w-1.5 rounded-full', pegged ? 'bg-success' : 'bg-warning')} />
+                    {peg.symbol} ${peg.price.toFixed(4)} · {pegged ? 'peg holding' : `${(peg.pegDeviation * 100).toFixed(2)}% off peg`}
+                  </span>
+                )}
               </div>
-              <ul className="max-h-80 divide-y divide-border/50 overflow-y-auto">
-                {NOTIFICATIONS.map((n) => {
-                  const Icon = n.icon;
-                  return (
-                    <li key={n.title} className="flex items-start gap-3 px-3 py-2.5 transition-colors hover:bg-foreground/5">
-                      <Icon className={cn('mt-0.5 h-4 w-4 shrink-0', n.tone)} />
-                      <div className="min-w-0">
-                        <div className="text-xs font-medium text-foreground">{n.title}</div>
-                        <div className="text-[11px] text-muted-foreground">{n.desc}</div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+              {actions === null ? (
+                <div className="px-3 py-6 text-center text-[11px] text-muted-foreground">
+                  syncing on-chain activity…
+                </div>
+              ) : actions.length === 0 ? (
+                <div className="px-3 py-6 text-center text-[11px] text-muted-foreground">
+                  No recorded actions indexed yet.
+                </div>
+              ) : (
+                <ul className="max-h-80 divide-y divide-border/50 overflow-y-auto">
+                  {actions.map((a) => {
+                    const meta = agentMeta(a.agent);
+                    const Icon = meta?.icon ?? ShieldAlert;
+                    const fresh = new Date(a.timestamp).getTime() > seenAt;
+                    return (
+                      <li key={a.txHash}>
+                        <a
+                          href={a.explorerUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-start gap-3 px-3 py-2.5 transition-colors hover:bg-foreground/5"
+                        >
+                          <Icon className={cn('mt-0.5 h-4 w-4 shrink-0', meta?.text ?? 'text-muted-foreground')} />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+                              <span className="capitalize">{a.agent}</span>
+                              <span className="font-mono text-[11px] text-foreground/80">{a.action}</span>
+                              {fresh && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />}
+                            </div>
+                            <div className="text-[11px] text-muted-foreground">
+                              {a.severity !== null ? `severity ${a.severity} · ` : ''}
+                              {a.success ? 'confirmed on Casper' : 'execution failed'} · {timeAgo(a.timestamp)}
+                            </div>
+                          </div>
+                          <ArrowUpRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/50 transition-colors group-hover:text-primary" />
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              <div className="flex items-center justify-between border-t border-border/70 px-3 py-2">
+                <span className="text-[10px] text-muted-foreground">
+                  record_action txs · live from CSPR.cloud
+                </span>
+                <a href="/security" className="text-[10px] text-primary hover:underline" onClick={() => setOpen(false)}>
+                  Security Center →
+                </a>
+              </div>
             </motion.div>
           </>
         )}
