@@ -122,5 +122,10 @@ export interface PipelineResult {
   advisories: AdvisoryAssessment[];
   /** How many agents anchored a real record_action on Casper this run. */
   onChainAgentCount: number;
+  /**
+   * Agent-to-agent x402 payroll: the Commander's facilitator-settled SOSC
+   * payments to each contributing specialist (null when the economy is off).
+   */
+  a2a: import('./x402/economy.js').A2aEconomyReport | null;
   trace: TraceStep[];
 }

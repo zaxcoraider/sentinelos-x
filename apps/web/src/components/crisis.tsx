@@ -21,12 +21,15 @@ import {
   CheckCircle2,
   Activity,
   CreditCard,
+  HandCoins,
+  XCircle,
 } from 'lucide-react';
 import type {
   MarketEvent,
   TraceStep,
   PipelineResult,
   AgentRole,
+  A2aPayment,
 } from '@sentinelos/agents';
 import { Button } from '@/components/ui/button';
 import { IconTile, Panel, PanelCard } from '@/components/mc/panel';
@@ -51,6 +54,13 @@ const AGENT_META: Record<AgentRole, { icon: typeof ShieldAlert; color: string; r
   Governance: { icon: Landmark, color: 'text-violet-400', ring: 'ring-violet-500/30', label: 'Governance Agent' },
 };
 
+/** 'risk' → 'Risk' — payroll roles are lowercase, AGENT_META keys are not. */
+const toAgentRole = (role: string): AgentRole =>
+  (role.charAt(0).toUpperCase() + role.slice(1)) as AgentRole;
+
+const sosc = (motes: string) =>
+  (Number(motes) / 1e9).toLocaleString('en-US', { maximumFractionDigits: 2 });
+
 function TxLink({ url, hash }: { url: string; hash: string }) {
   return (
     <a
@@ -71,6 +81,10 @@ export function Crisis() {
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dry, setDry] = useState(false);
+  /** Agents the Commander hired this run (payroll roster, in hire order). */
+  const [roster, setRoster] = useState<string[]>([]);
+  /** x402 payroll fees, appended live as each one settles on-chain. */
+  const [payments, setPayments] = useState<A2aPayment[]>([]);
   const running = phase === 'running';
 
   // Peg health derived from phase: nominal → depegged → recovered.
@@ -95,6 +109,8 @@ export function Crisis() {
     setSteps([]);
     setResult(null);
     setError(null);
+    setRoster([]);
+    setPayments([]);
     const ctrl = new AbortController();
     abortRef.current = ctrl;
 
@@ -124,11 +140,18 @@ export function Crisis() {
           const msg = JSON.parse(line) as
             | { type: 'start' }
             | { type: 'step'; step: TraceStep }
+            | { type: 'payment'; payment: A2aPayment }
             | { type: 'result'; result: PipelineResult }
             | { type: 'error'; message: string };
-          if (msg.type === 'step') setSteps((prev) => [...prev, msg.step]);
-          else if (msg.type === 'result') setResult(msg.result);
-          else if (msg.type === 'error') {
+          if (msg.type === 'step') {
+            setSteps((prev) => [...prev, msg.step]);
+            const hired = msg.step.detail?.payrollRoster as string[] | undefined;
+            if (hired) setRoster(hired);
+          } else if (msg.type === 'payment') setPayments((prev) => [...prev, msg.payment]);
+          else if (msg.type === 'result') {
+            setResult(msg.result);
+            if (msg.result.a2a) setPayments(msg.result.a2a.payments);
+          } else if (msg.type === 'error') {
             setError(msg.message);
             setPhase('error');
             return;
@@ -227,9 +250,10 @@ export function Crisis() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <p className="max-w-sm text-sm text-muted-foreground">
               Injects a {(deviation * 100).toFixed(0)}% USDC depeg and turns the live agent team loose:
-              Risk scores it, Commander routes, Treasury buys premium data over{' '}
-              <span className="font-mono text-foreground">x402</span> and acts, Governance drafts an
-              emergency proposal — all anchored on Casper.
+              Risk scores it, Commander routes and hires the specialists — paying each one a real{' '}
+              <span className="font-mono text-foreground">SOSC</span> fee over{' '}
+              <span className="font-mono text-foreground">x402</span> — Treasury buys premium data and
+              acts, Governance drafts an emergency proposal — all anchored on Casper.
             </p>
             <div className="flex flex-col items-end gap-2">
               <Button onClick={trigger} disabled={running} className="bg-red-500 text-white hover:bg-red-500/90">
@@ -359,6 +383,78 @@ export function Crisis() {
         )}
       </AnimatePresence>
 
+      {/* Agent-to-agent x402 payroll — streams live as each fee settles */}
+      <AnimatePresence>
+        {(roster.length > 0 || payments.length > 0) && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+            <Panel
+              title="Agent economy — x402 payroll"
+              icon={HandCoins}
+              tone="52, 211, 153"
+              right={
+                <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase text-muted-foreground">
+                  {payments.filter((p) => p.status === 'settled').length}/{roster.length || payments.length} settled
+                </span>
+              }
+              bodyClassName="flex flex-col gap-3 p-5"
+            >
+              <p className="text-sm text-muted-foreground">
+                The Commander hires the team and pays each specialist a real{' '}
+                <span className="font-mono text-foreground">SOSC</span> service fee to its own Casper
+                wallet — EIP-712 CEP-18 transfers verified &amp; settled on-chain by the official{' '}
+                <span className="font-medium">Casper x402 facilitator</span>, gas sponsored.
+              </p>
+              <ul className="flex flex-col divide-y divide-border/60">
+                {(roster.length > 0 ? roster : payments.map((p) => p.role)).map((role) => {
+                  const meta = AGENT_META[toAgentRole(role)];
+                  const Icon = meta?.icon ?? HandCoins;
+                  const payment = payments.find((p) => p.role === role);
+                  return (
+                    <li key={role} className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                      <span className="flex items-center gap-2.5">
+                        <span className={cn('flex h-6 w-6 items-center justify-center rounded-full bg-card ring-1', meta?.ring)}>
+                          <Icon className={cn('h-3.5 w-3.5', meta?.color)} />
+                        </span>
+                        <span className="text-sm font-medium">{meta?.label ?? role}</span>
+                      </span>
+                      <span className="flex items-center gap-3">
+                        {payment && (
+                          <span className="font-mono text-xs tabular-nums text-foreground">
+                            {sosc(payment.amountMotes)} SOSC
+                          </span>
+                        )}
+                        {!payment ? (
+                          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <Loader2 className="h-3 w-3 animate-spin" /> settling…
+                          </span>
+                        ) : payment.status === 'settled' ? (
+                          <span className="flex items-center gap-2">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                            {payment.explorerUrl && payment.txHash && (
+                              <TxLink url={payment.explorerUrl} hash={payment.txHash} />
+                            )}
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1.5 text-xs text-red-400" title={payment.error}>
+                            <XCircle className="h-3.5 w-3.5" /> failed
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+              {result?.a2a && (
+                <div className="border-t border-border pt-2.5 text-xs text-muted-foreground">
+                  {result.a2a.settledCount} on-chain payments · {sosc(result.a2a.totalMotes)} SOSC paid out ·
+                  every agent wallet independently verifiable on Casper testnet
+                </div>
+              )}
+            </Panel>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {result?.governance && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
@@ -416,7 +512,7 @@ export function Crisis() {
       </AnimatePresence>
 
       <footer className="text-xs text-muted-foreground">
-        Live agents (Risk · Commander · Treasury · Governance) + x402 + on-chain records. No mock data.
+        Live agents (Risk · Commander · Treasury · Governance) + agent-to-agent x402 economy + on-chain records. No mock data.
       </footer>
     </main>
   );

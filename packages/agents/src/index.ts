@@ -6,4 +6,7 @@ export { decideTreasury } from './agents/treasury.js';
 export { draftProposal } from './agents/governance.js';
 export { fetchPremiumData } from './x402/client.js';
 export type { VolatilityData, X402Payment, PremiumDataResult } from './x402/client.js';
+export { a2aEnabled, feeFor } from './x402/economy.js';
+export { AGENT_WALLETS, type AgentWallet } from './x402/wallets.js';
+export type { A2aPayment, A2aEconomyReport, A2aPaymentStatus } from './x402/economy.js';
 export { AGENT_MODEL, ROUTE_THRESHOLD, X402_MODE, X402_ENABLED } from './config.js';

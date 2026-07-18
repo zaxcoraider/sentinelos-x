@@ -17,15 +17,27 @@ import { reportOracle } from './agents/oracle.js';
 import { reportAnalytics } from './agents/analytics.js';
 import { runAdvisories } from './agents/advisory.js';
 import { fetchPremiumData, type VolatilityData, type X402Payment } from './x402/client.js';
+import {
+  a2aEnabled,
+  runPayroll,
+  buildReport,
+  payrollTotalMotes,
+  ADVISORY_PAYEES,
+  type A2aEconomyReport,
+  type A2aPayment,
+} from './x402/economy.js';
 import { X402_ENABLED, ADVISORY_ENABLED, AGENTS_ONCHAIN } from './config.js';
 
 const now = () => new Date().toISOString();
+const fmtSosc = (motes: string) => (Number(motes) / 1e9).toLocaleString('en-US', { maximumFractionDigits: 2 });
 
 export interface RunOptions {
   /** Fire real Casper `record_action` txs for the agents. Default true. */
   live?: boolean;
   /** Called as each agent finishes — lets a UI stream the trace live. */
   onStep?: (step: TraceStep) => void;
+  /** Called as each agent-to-agent x402 payment settles — streams the payroll. */
+  onPayment?: (payment: A2aPayment) => void;
 }
 
 /** Agents that always anchor on-chain; the rest anchor only when AGENTS_ONCHAIN=all. */
@@ -41,7 +53,7 @@ const CORE_ONCHAIN = new Set<string>(['treasury', 'governance']);
  */
 export async function runPipeline(
   event: MarketEvent,
-  { live = true, onStep }: RunOptions = {},
+  { live = true, onStep, onPayment }: RunOptions = {},
 ): Promise<PipelineResult> {
   const trace: TraceStep[] = [];
   const push = (step: TraceStep) => {
@@ -160,8 +172,41 @@ export async function runPipeline(
       analytics,
       advisories: [],
       onChainAgentCount,
+      a2a: null,
       trace,
     };
+  }
+
+  // 4b. Commander opens the x402 payroll — every specialist it hires for this
+  //     incident gets a real SOSC service fee, EIP-712-signed by the Commander
+  //     and settled on-chain by the Casper x402 facilitator (gas sponsored).
+  //     Settlements run concurrently with the rest of the response, so paying
+  //     the team costs the incident no wall-clock time.
+  const payrollPaid: A2aPayment[] = [];
+  let payrollPromise: Promise<A2aEconomyReport> | null = null;
+  let payrollRosterSize = 0;
+  if (live && a2aEnabled()) {
+    const roster = [
+      'risk',
+      ...(oracle ? ['oracle'] : []),
+      ...(analytics ? ['analytics'] : []),
+      'treasury',
+      'governance',
+      ...(ADVISORY_ENABLED ? ADVISORY_PAYEES : []),
+    ];
+    payrollRosterSize = roster.length;
+    payrollPromise = runPayroll(roster, (p) => {
+      payrollPaid.push(p);
+      onPayment?.(p);
+    });
+    push({
+      agent: 'Commander',
+      summary:
+        `Hired ${roster.length} specialist agents over x402 — ${fmtSosc(payrollTotalMotes(roster))} SOSC payroll, ` +
+        'each fee an EIP-712 CEP-18 transfer settled on-chain by the Casper facilitator (gas sponsored)',
+      detail: { payrollRoster: roster, payrollTotalMotes: payrollTotalMotes(roster) },
+      at: now(),
+    });
   }
 
   // 5. Treasury Agent — decide the protective action (informed by the paid data).
@@ -217,6 +262,30 @@ export async function runPipeline(
     at: now(),
   });
 
+  // 8. Close the payroll — wait (bounded) for the remaining settlements and
+  //    report honestly how many fees actually landed on-chain.
+  let a2a: A2aEconomyReport | null = null;
+  if (payrollPromise) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    a2a = await Promise.race([
+      payrollPromise,
+      new Promise<A2aEconomyReport>((resolve) => {
+        timer = setTimeout(() => resolve(buildReport(payrollPaid)), 120_000);
+      }),
+    ]);
+    clearTimeout(timer);
+    const failed = a2a.payments.length - a2a.settledCount;
+    push({
+      agent: 'Commander',
+      summary:
+        `Payroll settled — ${a2a.settledCount}/${payrollRosterSize} agents paid ${fmtSosc(a2a.totalMotes)} SOSC ` +
+        `on-chain via the Casper x402 facilitator` +
+        (failed > 0 ? ` (${failed} settlement${failed === 1 ? '' : 's'} did not land this run)` : ''),
+      detail: { a2a },
+      at: now(),
+    });
+  }
+
   return {
     event,
     severity: risk.severity,
@@ -230,6 +299,7 @@ export async function runPipeline(
     analytics,
     advisories,
     onChainAgentCount,
+    a2a,
     trace,
   };
 }

@@ -8,7 +8,7 @@
 
 **Most Web3 AI _answers questions_. SentinelOS _runs the protocol_.**
 
-A team of **12 AI agents** that detect an incident, pay for data over **x402**, decide a fix, and
+A team of **12 AI agents** that detect an incident, pay for data — and **pay each other** — over **x402**, decide a fix, and
 **execute it on Casper** — while a human only approves. Every agent's action is a verifiable
 on-chain transaction.
 
@@ -63,7 +63,8 @@ with zero human keystrokes, captured from a live run:
 📡  Oracle      → buys the premium feed over x402 (real Casper facilitator + CSPR
                   settlement), confirms USDC peg + ETH reference — anchored on-chain
 📊  Analytics   → real annualized vol → STRESSED regime, 24h depeg probability — anchored
-🧭  Commander   → 82 > 60 threshold → wake the full team
+🧭  Commander   → 82 > 60 threshold → wake the full team — and HIRE it: pays every
+                  specialist a real SOSC fee over x402 (11 payments, facilitator-settled)
 💰  Treasury    → decides REBALANCE (88%, ~$4.2M protected) → executes on-chain
 ⚖️🌊🛟🌱📣📜  Compliance · Liquidity · Insurance · Growth · Community · Legal
                 → six domain agents weigh in (Claude), each anchored on-chain
@@ -101,6 +102,38 @@ its own action** on Casper Testnet:
 Casper x402 facilitator**: [`48af4ef6…`](https://testnet.cspr.live/transaction/48af4ef677f95151ab132290cf042871681941f7ba5c507d49b8319ceb227611)
 &nbsp;·&nbsp; **SOSC token package:** [`640f5260…`](https://testnet.cspr.live/contract-package/640f52609a8f975869ad26216816cd81e340e4a8183be75886fd5dc1944dc3e0)
 &nbsp;·&nbsp; **contract package:** [`7f56caa1…`](https://testnet.cspr.live/contract-package/7f56caa1d89d394786354bc382b1896fcd21fd77d0cea33c41a54e28c56990db)
+
+---
+
+## 💸 The agent-to-agent x402 economy — agents don't work for free
+
+SentinelOS agents are **economic actors**: every specialist owns its **own Casper wallet**
+(keys generated once, secrets never committed), publishes an x402 price quote for its service,
+and gets **paid real SOSC per incident** by the Commander. Each fee is an **EIP-712
+`transfer_with_authorization`** over our CEP-18 token, **verified + settled + gas-sponsored by
+the official hosted Casper x402 facilitator** — so the agent wallets hold **zero CSPR** and
+still get paid on-chain. Payroll settles *concurrently* with the incident response: paying
+11 agents costs the response no wall-clock time.
+
+From the same live drill — **one incident, 11 agent-to-agent payments, all on-chain**:
+
+| Agent | Fee | Payment (Commander → agent wallet) |
+|-------|----:|------------------------------------|
+| 🛡 Risk | 1 SOSC | [`25871571…`](https://testnet.cspr.live/transaction/25871571462b9cf23554b546cce6b8a8c9ebeec1b74996279021b2e380a108c2) |
+| 📡 Oracle | 1 SOSC | [`bfa9bea0…`](https://testnet.cspr.live/transaction/bfa9bea0a0416b96067cf188a57ec9ee51cc3d3e3a3d8a3888f91d068789a12a) |
+| 📊 Analytics | 1 SOSC | [`5bdc1803…`](https://testnet.cspr.live/transaction/5bdc1803de68a6b816ce8c15268c727805b45c02d42cc0ecaa66407b89b558a0) |
+| 💰 Treasury | 1 SOSC | [`e6eb53e9…`](https://testnet.cspr.live/transaction/e6eb53e9d68e46e023dbc100cc7e7068607a967fc1244028a4acc42e9b1d2188) |
+| 🏛 Governance | 1 SOSC | [`b4065621…`](https://testnet.cspr.live/transaction/b40656218ae0ba44294d7e44fb010ae05e0b7c475e17545ae5f38ba4d2be066e) |
+| ⚖️ Compliance | 0.5 SOSC | [`996f40a4…`](https://testnet.cspr.live/transaction/996f40a4d58b9d6bc628ff4725e0e2efaeba2b00e65f1920b98bfbfec98746f4) |
+| 🌊 Liquidity | 0.5 SOSC | [`d1873058…`](https://testnet.cspr.live/transaction/d18730588ce5dc09cceeb8159a6d4446989c3e0651d604c5a293f968f5a40dbf) |
+| 🛟 Insurance | 0.5 SOSC | [`3110ed79…`](https://testnet.cspr.live/transaction/3110ed799e7560ce68944959356e5dc4e0c30ffcba8e5aadd56448c4ede58daf) |
+| 🌱 Growth | 0.5 SOSC | [`28d96730…`](https://testnet.cspr.live/transaction/28d96730e79076cf79a066c6ae3b0d1386573ab0b31cef6c5c811a6301933fe6) |
+| 📣 Community | 0.5 SOSC | [`7261ccb5…`](https://testnet.cspr.live/transaction/7261ccb5ed6f16741ce2e994c2c662d2d0ad5ee3076e7a5db9bcd4b84e30676d) |
+| 📜 Legal | 0.5 SOSC | [`003566dd…`](https://testnet.cspr.live/transaction/003566dd5aa1dac56e74a50f626fb9fc50bbf319c23ab94ff274c9efa41808dd) |
+
+**8 SOSC paid out per incident** · agent wallet registry (public keys + account hashes) lives in
+[`packages/agents/src/x402/wallets.ts`](packages/agents/src/x402/wallets.ts) · pay the team
+yourself: `X402_MODE=live npx tsx scripts/pay-team.ts` (from `packages/agents`).
 
 ---
 
@@ -207,6 +240,7 @@ flowchart TD
 |--------|--------|
 | **Mission Control** — live 12-agent network, streaming reasoning, threat + on-chain status | 🟢 Live |
 | **Crisis Response** — streamed depeg → trace → x402 → tx → recover | 🟢 Live |
+| **Agent Economy** — Commander pays all 11 specialists real SOSC over x402, streamed live | 🟢 Live |
 | **Agent Team** — the 12 live agents + a marketplace/SDK preview | 🟢 Live |
 | **Governance Council** — AI council debates the response and submits a motion on-chain | 🟢 Live |
 | **Security Center** — threat radar over on-chain state + live event log | 🟢 Live |
@@ -232,8 +266,9 @@ Everything below extends something already live in this repo — not a wishlist.
 - **Provable AI operations** — a tamper-proof, on-chain record of *why* every autonomous
   action was taken. Only a Casper-native OS can promise this. *(Today all 12 agents anchor `record_action`.)*
 - **An x402 data & compute economy** — agents autonomously buy data + compute over x402.
-  *(Today: full CEP-18 + EIP-712 settlement via the official facilitator is **live** — the next
-  step is many feeds and agent-to-agent commerce.)*
+  *(Today: **agent-to-agent commerce is live** — the Commander pays all 11 specialists real
+  SOSC per incident via the official facilitator, and the Oracle buys the premium feed the
+  same way. Next: third-party feeds and cross-protocol agent hiring.)*
 - **Agents that act, not just advise** — hedging, liquidity provisioning, insurance payouts
   via more contract entry points. *(Today Treasury executes a real REBALANCE.)*
 - **A public MCP surface** — any external agent, or a human via Claude, drives SentinelOS
@@ -251,11 +286,12 @@ SentinelOS runs on the official [Casper AI Toolkit](https://www.casper.network/a
 - **MCP (Model Context Protocol)** — the official **Casper MCP server** (`mcp.testnet.cspr.cloud`)
   is wired in [`.mcp.json`](.mcp.json), so any MCP agent can query and operate TreasuryGuard —
   `get_account_deploys`, `get_contract`, `get_account_ft_balances`, and 40+ more. Verified: `CasperMcp v3.1.0`.
-- **x402** — the **full production path is live**: the agent signs an **EIP-712
-  `transfer_with_authorization`** with the official `@make-software/casper-x402` client over our
-  CEP-18 token (deployed from the reference `Cep18X402.wasm`), and the feed drives the hosted
-  facilitator's **`/verify` + `/settle`** — the facilitator submits the transfer on-chain and
-  **sponsors the gas** (`feePayer`). `GET /supported` still gates the rail, and settlement
+- **x402** — the **full production path is live, twice over**: (1) the Oracle buys the premium
+  feed, and (2) the Commander runs the **agent payroll** — in both, an **EIP-712
+  `transfer_with_authorization`** signed with the official `@make-software/casper-x402` client
+  over our CEP-18 token (deployed from the reference `Cep18X402.wasm`) is driven through the
+  hosted facilitator's **`/verify` + `/settle`** — the facilitator submits the transfer on-chain
+  and **sponsors the gas** (`feePayer`). `GET /supported` still gates the rail, and settlement
   degrades to a native CSPR transfer, then a stub, if anything is down.
 
 ```jsonc
@@ -273,7 +309,7 @@ SentinelOS runs on the official [Casper AI Toolkit](https://www.casper.network/a
 sentinelos-x/
 ├── contracts/treasury_guard/   Odra contract (Rust) — DEPLOYED to testnet
 ├── packages/casper/            TS chain layer (recordAction · readState · transferCspr)
-├── packages/agents/            12-agent orchestrator + x402 client + facilitator
+├── packages/agents/            12-agent orchestrator + x402 client + a2a economy (payroll)
 ├── services/premium-data/      x402-gated live market feed (HTTP 402 · CoinGecko)
 └── apps/web/                   Next.js dashboard (Mission Control · Crisis · Agents · Governance · Security)
 ```
@@ -299,6 +335,10 @@ npm run start --workspace @sentinelos/premium-data   # :4021
 X402_MODE=live npm run agent --workspace @sentinelos/agents
 #   → prints all 12 cspr.live tx links. Add --dry (drop X402_MODE=live) for a no-spend check.
 #   AGENTS_ONCHAIN=all writes all 12 (~240 CSPR); =core writes Treasury + Governance only.
+
+# 4. Just the agent-to-agent x402 payroll — Commander pays the team real SOSC
+cd packages/agents && X402_MODE=live npx tsx scripts/pay-team.ts
+#   → 11 facilitator-settled CEP-18 transfers, gas sponsored, one tx link each.
 ```
 
 Rebuild / redeploy the contract: `bash scripts/build_contract.sh`, then see `scripts/deploy.md`.

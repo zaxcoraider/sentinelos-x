@@ -97,6 +97,20 @@ export const FACILITATOR_API_KEY = process.env.CSPR_CLOUD_API_KEY ?? '';
  */
 export const X402_FACILITATOR_ENABLED = (process.env.X402_FACILITATOR ?? 'on') !== 'off';
 
+// --- Agent-to-agent x402 economy (Commander pays the specialists in SOSC) ---
+/** CEP-18 contract package of the SOSC token (bare hex). Shared with the feed. */
+export const A2A_ASSET_PACKAGE = (process.env.X402_ASSET_PACKAGE ?? '').replace(/^hash-/, '');
+/** EIP-712 domain name of the SOSC token (must match the deployed contract). */
+export const A2A_ASSET_NAME = process.env.X402_ASSET_NAME ?? 'SentinelOS Credit';
+/** Master switch for the agent payroll. Off → agents work pro bono (dev mode). */
+export const A2A_ECONOMY_ENABLED = (process.env.A2A_ECONOMY ?? 'on') !== 'off';
+/** Fee per core specialist agent (motes, 9 decimals — default 1 SOSC). */
+export const A2A_FEE_MOTES = process.env.A2A_FEE_MOTES ?? '1000000000';
+/** Fee per domain-advisory agent (default 0.5 SOSC). */
+export const A2A_ADVISORY_FEE_MOTES = process.env.A2A_ADVISORY_FEE_MOTES ?? '500000000';
+/** Parallel facilitator settlements in flight (be polite to the hosted API). */
+export const A2A_CONCURRENCY = Math.max(1, Number(process.env.A2A_CONCURRENCY ?? 3));
+
 export function requireApiKey(): string {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) {

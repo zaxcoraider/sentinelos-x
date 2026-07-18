@@ -33,6 +33,10 @@ new ones.
 - Honest split: Treasury + Governance take protocol **actions**; the other ten contribute real
   **data/analysis** (Oracle + Analytics deterministic over live data; six advisory agents are
   real Claude). All twelve anchor a verifiable record on-chain.
+- An **agent-to-agent x402 economy**: every specialist owns its **own Casper wallet** and the
+  Commander pays each one a **real SOSC (CEP-18) service fee per incident** — EIP-712
+  `transfer_with_authorization`, verified + settled + **gas-sponsored by the official Casper
+  x402 facilitator**. One incident = 11 agent-to-agent payments on-chain, streamed live in the UI.
 - A Next.js "Mission Control" dashboard streams the whole trace live — an animated 12-node agent
   network, reasoning panel, and event timeline — and links every action to cspr.live.
 - The monitored asset is real USDC (live peg); the depeg is a clearly-labeled stress drill.
@@ -59,6 +63,7 @@ on-chain event feed), Odra, live handshake to the official **Casper x402 facilit
 - Governance `PROPOSAL` — https://testnet.cspr.live/transaction/996dff137cfda9869a2c0eadfe7fa8f9c84971bf1fecd675f95a28069c2416e2
 - Oracle `FEED_CONFIRMED` — https://testnet.cspr.live/transaction/1c6132d49f804de4191e831a0d77985bd4e7c713bfa967e53e596239bbeaa00b
 - x402 settlement (via Casper facilitator) — https://testnet.cspr.live/transaction/f82bbf7f76caff29b613ed21dca3ac76ab9ed63e928da9f66f73f9f196374c6d
+- Agent payroll: Commander → Risk agent's wallet, 1 SOSC via the facilitator (1 of 11 in one incident) — https://testnet.cspr.live/transaction/25871571462b9cf23554b546cce6b8a8c9ebeec1b74996279021b2e380a108c2
 - **All 12 agent records** (Risk, Analytics, Commander, Compliance, Liquidity, Insurance, Growth, Community, Legal + the above) are listed in the README's on-chain-proof table.
 
 **What's next (every step extends something already live). Next (v1):** an agent **marketplace +

@@ -1,5 +1,5 @@
 import { runPipeline } from '@sentinelos/agents';
-import type { MarketEvent, TraceStep } from '@sentinelos/agents';
+import type { A2aPayment, MarketEvent, TraceStep } from '@sentinelos/agents';
 
 // The pipeline signs Casper txs and calls Claude — must run on the Node runtime,
 // never cached (every run is a real, live invocation).
@@ -13,8 +13,10 @@ const DEFAULT_EVENT: MarketEvent = { type: 'DEPEG', asset: 'USDC', deviation: 0.
 /**
  * Streams the sentinel crisis pipeline as newline-delimited JSON so the UI can
  * render each agent's step the moment it truly completes:
- *   {type:'start', event} → {type:'step', step}… → {type:'result', result}
- * (or {type:'error', message} on failure).
+ *   {type:'start', event} → {type:'step', step}… + {type:'payment', payment}…
+ *   → {type:'result', result}
+ * (or {type:'error', message} on failure). Payment events stream the Commander's
+ * agent-to-agent x402 payroll as each SOSC fee settles on-chain.
  */
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({} as Record<string, unknown>));
@@ -33,6 +35,7 @@ export async function POST(req: Request) {
         const result = await runPipeline(event, {
           live,
           onStep: (step: TraceStep) => send({ type: 'step', step }),
+          onPayment: (payment: A2aPayment) => send({ type: 'payment', payment }),
         });
         send({ type: 'result', result });
       } catch (err) {
