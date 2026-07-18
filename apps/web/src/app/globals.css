@@ -44,7 +44,7 @@ body {
 }
 
 /* Ops-console backdrop: faint grid + layered aurora glows.
-   The animated particle field lives in <AmbientBackground/> on top of this. */
+   The neon-tunnel video in <VideoBackground/> plays on top of this. */
 body::before {
   content: '';
   position: fixed;
