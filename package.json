@@ -2,7 +2,7 @@
   "name": "sentinelos-x",
   "private": true,
   "version": "0.1.0",
-  "description": "SentinelOS X — autonomous treasury sentinel on Casper",
+  "description": "SentinelOS — the autonomous operating system for Web3 protocols, on Casper",
   "license": "MIT",
   "workspaces": [
     "packages/*",

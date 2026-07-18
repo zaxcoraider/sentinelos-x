@@ -1,7 +1,7 @@
 import { recordAction, readState, waitForExecution } from '../src/index.js';
 
 async function main() {
-  console.log('=== SentinelOS X — record_action demo (Node + casper-js-sdk) ===\n');
+  console.log('=== SentinelOS — record_action demo (Node + casper-js-sdk) ===\n');
 
   const before = await readState('treasury');
   console.log('State BEFORE: total_actions =', before.totalActions, '| last_action =', before.lastAction ?? '(none)');

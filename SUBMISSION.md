@@ -1,4 +1,4 @@
-# SentinelOS X — Submission Kit
+# SentinelOS — Submission Kit
 
 The judge-facing answers for the **Casper Agentic Buildathon 2026** (Agentic AI track) —
 copy these into the DoraHacks form. (The video script + recording checklist live in the
@@ -8,7 +8,7 @@ local, gitignored `SUBMISSION_NOTES.md`.)
 
 ## DoraHacks form answers
 
-**Project name:** SentinelOS X
+**Project name:** SentinelOS
 
 **Tagline (one line):** An autonomous operating system for Web3 — a team of AI agents that
 detect a stablecoin depeg, pay for data over x402, and execute the fix on Casper in seconds.
