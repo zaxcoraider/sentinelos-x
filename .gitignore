@@ -39,3 +39,4 @@ Thumbs.db
 
 # pre-lowering wasm backup (local only)
 *.raw.wasm
+.vercel
