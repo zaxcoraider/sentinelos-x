@@ -65,25 +65,44 @@ export async function runPipeline(
   const shouldAnchor = (agentLower: string) =>
     live && (AGENTS_ONCHAIN === 'all' || CORE_ONCHAIN.has(agentLower));
 
-  /** Best-effort on-chain anchor for an agent. Never throws; returns tx or null. */
+  /** Why the last anchor attempt failed — consumed by the next anchorDetail. */
+  let lastAnchorError: string | undefined;
+
+  /**
+   * Best-effort on-chain anchor for an agent. Public-node submits fail
+   * transiently (rate limits, cold-start timeouts), so retry once after a
+   * short backoff before conceding. Never throws; returns tx or null.
+   */
   const anchor = async (
     agentLower: string,
     action: string,
     severity: number,
     value: number,
   ): Promise<OnChainResult | null> => {
+    lastAnchorError = undefined;
     if (!shouldAnchor(agentLower)) return null;
-    try {
-      const res = await recordAction(agentLower, action, Math.round(severity), Math.max(0, Math.round(value)));
-      onChainAgentCount++;
-      return res;
-    } catch {
-      return null; // node hiccup → this agent is "analysis only" this run (honest)
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const res = await recordAction(agentLower, action, Math.round(severity), Math.max(0, Math.round(value)));
+        onChainAgentCount++;
+        return res;
+      } catch (err) {
+        if (attempt === 0) {
+          await new Promise((r) => setTimeout(r, 2000));
+          continue;
+        }
+        lastAnchorError = err instanceof Error ? err.message : String(err);
+        return null; // still failing → this agent is "analysis only" this run (honest)
+      }
     }
   };
 
   const anchorDetail = (tx: OnChainResult | null, extra: Record<string, unknown> = {}) =>
-    tx ? { ...extra, txHash: tx.txHash, explorerUrl: tx.explorerUrl } : extra;
+    tx
+      ? { ...extra, txHash: tx.txHash, explorerUrl: tx.explorerUrl }
+      : lastAnchorError
+        ? { ...extra, anchorError: lastAnchorError }
+        : extra;
   const anchored = (tx: OnChainResult | null) => (tx ? ' · recorded on Casper' : '');
 
   // 1. Risk Agent — score the raw event.
