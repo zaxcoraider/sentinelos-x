@@ -83,15 +83,16 @@ export async function resolveFacilitatorSupport(
 }
 
 // ---- /verify + /settle -------------------------------------------------------
-// The production settlement path: the client builds an EIP-712-signed
-// PaymentPayload over a CEP-18 asset (testnet WCSPR) and the facilitator
-// verifies then settles it. Exposed for the full-swap path; the live demo
-// gates on resolveFacilitatorSupport() and settles CSPR natively.
+// The production settlement path: the client signs an EIP-712 PaymentPayload
+// over our CEP-18 asset (SentinelOS Credit, deployed from the official
+// Cep18X402.wasm) and the facilitator verifies it, then settles by submitting
+// `transfer_with_authorization` on-chain — paying the gas itself (feePayer).
 
 export interface VerifyResponse {
   isValid: boolean;
   payer?: string;
   invalidReason?: string;
+  invalidMessage?: string;
   [k: string]: unknown;
 }
 
@@ -110,7 +111,12 @@ async function facilitatorPost<T>(path: string, body: unknown): Promise<T> {
     headers: { ...authHeaders(), 'content-type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`facilitator ${path} returned HTTP ${res.status}`);
+  if (!res.ok) {
+    // Surface the facilitator's error body — it names the invalid field, which
+    // is the only way to debug a rejected payload.
+    const detail = await res.text().catch(() => '');
+    throw new Error(`facilitator ${path} returned HTTP ${res.status}${detail ? `: ${detail.slice(0, 300)}` : ''}`);
+  }
   return (await res.json()) as T;
 }
 

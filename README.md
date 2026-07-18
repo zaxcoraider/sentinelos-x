@@ -97,7 +97,9 @@ its own action** on Casper Testnet:
 | 11 | 📜 Legal | `CAUTION` | [`5bfa7239…`](https://testnet.cspr.live/transaction/5bfa7239968e649434ec8547b7f28474d1d289782dfb2bdae0bdffa2f70f57ef) |
 | 12 | 🏛 Governance | `PROPOSAL` | [`996dff13…`](https://testnet.cspr.live/transaction/996dff137cfda9869a2c0eadfe7fa8f9c84971bf1fecd675f95a28069c2416e2) |
 
-➕ **x402 settlement** paid over the official Casper facilitator: [`f82bbf7f…`](https://testnet.cspr.live/transaction/f82bbf7f76caff29b613ed21dca3ac76ab9ed63e928da9f66f73f9f196374c6d)
+➕ **x402 settlement** — EIP-712 CEP-18 payment **verified + settled + gas-sponsored by the official
+Casper x402 facilitator**: [`48af4ef6…`](https://testnet.cspr.live/transaction/48af4ef677f95151ab132290cf042871681941f7ba5c507d49b8319ceb227611)
+&nbsp;·&nbsp; **SOSC token package:** [`640f5260…`](https://testnet.cspr.live/contract-package/640f52609a8f975869ad26216816cd81e340e4a8183be75886fd5dc1944dc3e0)
 &nbsp;·&nbsp; **contract package:** [`7f56caa1…`](https://testnet.cspr.live/contract-package/7f56caa1d89d394786354bc382b1896fcd21fd77d0cea33c41a54e28c56990db)
 
 ---
@@ -165,11 +167,14 @@ flowchart TD
   tool-based structured output) via the **DGrid** gateway. Commander is a deterministic threshold
   gate; Oracle + Analytics are deterministic over live market data; the six advisory agents run
   in parallel on a fast model. Every agent anchors its own `record_action`.
-- **x402** — `services/premium-data`: an HTTP **402 Payment Required** feed. On the challenge, the
-  client calls the **official hosted Casper x402 facilitator** (`x402-facilitator.cspr.cloud`,
-  authenticated with our CSPR.cloud key), confirms the `exact` scheme on `casper:casper-test`,
-  then settles and unlocks **real live market data** (CoinGecko ETH volatility + USDC peg).
-  Best-effort — the loop proceeds if it's down, so **qualification never depends on x402**.
+- **x402** — an HTTP **402 Payment Required** feed (`/api/premium`) with **full facilitator
+  settlement**: the agent signs an **EIP-712 `transfer_with_authorization`** over our own
+  **CEP-18 token** (SentinelOS Credit, deployed from the official `Cep18X402.wasm`) using
+  `@make-software/casper-x402`, the feed verifies + settles it through the **official hosted
+  Casper x402 facilitator** (`/verify` + `/settle`, authenticated with our CSPR.cloud key), and
+  the facilitator submits the token transfer on-chain **paying the gas itself** — then the feed
+  unlocks **real live market data** (CoinGecko ETH volatility + USDC peg). Degrades gracefully:
+  facilitator rail → native CSPR transfer → stub, so **qualification never depends on x402**.
 - **Chain I/O** — `packages/casper`: `casper-js-sdk` 5.0.12 for `recordAction`, `readState`, and
   `transferCspr` (the signing key stays server-side).
 
@@ -226,8 +231,9 @@ Everything below extends something already live in this repo — not a wishlist.
 **The vision**
 - **Provable AI operations** — a tamper-proof, on-chain record of *why* every autonomous
   action was taken. Only a Casper-native OS can promise this. *(Today all 12 agents anchor `record_action`.)*
-- **An x402 data & compute economy** — agents autonomously buy data + compute over x402,
-  full CEP-18 (WCSPR) + EIP-712 settlement. *(Today a real paid feed via the official Casper facilitator.)*
+- **An x402 data & compute economy** — agents autonomously buy data + compute over x402.
+  *(Today: full CEP-18 + EIP-712 settlement via the official facilitator is **live** — the next
+  step is many feeds and agent-to-agent commerce.)*
 - **Agents that act, not just advise** — hedging, liquidity provisioning, insurance payouts
   via more contract entry points. *(Today Treasury executes a real REBALANCE.)*
 - **A public MCP surface** — any external agent, or a human via Claude, drives SentinelOS
@@ -245,11 +251,12 @@ SentinelOS runs on the official [Casper AI Toolkit](https://www.casper.network/a
 - **MCP (Model Context Protocol)** — the official **Casper MCP server** (`mcp.testnet.cspr.cloud`)
   is wired in [`.mcp.json`](.mcp.json), so any MCP agent can query and operate TreasuryGuard —
   `get_account_deploys`, `get_contract`, `get_account_ft_balances`, and 40+ more. Verified: `CasperMcp v3.1.0`.
-- **x402** — on every paid fetch the agent makes a **live, authenticated call to the official
-  Casper x402 facilitator** (`x402-facilitator.cspr.cloud` `GET /supported`) to confirm the scheme
-  + network and read its settlement `feePayer`. The value leg settles via a real native-CSPR
-  transfer; `verifyPayment`/`settlePayment` wire the facilitator's `/verify` + `/settle` for the
-  full CEP-18 (WCSPR) + EIP-712 production path.
+- **x402** — the **full production path is live**: the agent signs an **EIP-712
+  `transfer_with_authorization`** with the official `@make-software/casper-x402` client over our
+  CEP-18 token (deployed from the reference `Cep18X402.wasm`), and the feed drives the hosted
+  facilitator's **`/verify` + `/settle`** — the facilitator submits the transfer on-chain and
+  **sponsors the gas** (`feePayer`). `GET /supported` still gates the rail, and settlement
+  degrades to a native CSPR transfer, then a stub, if anything is down.
 
 ```jsonc
 // .mcp.json — the official Casper MCP server, keyed by CSPR_CLOUD_API_KEY

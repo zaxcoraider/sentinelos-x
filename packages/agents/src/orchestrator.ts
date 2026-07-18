@@ -98,7 +98,12 @@ export async function runPipeline(
       x402 = premium.payment;
       oracle = reportOracle(event, volatility);
       const paidVia = x402.mode === 'live' ? `live · ${x402.txHash}` : 'stub';
-      const viaFac = x402.facilitator ? `, via Casper x402 facilitator (${x402.facilitator.network})` : '';
+      const viaFac =
+        x402.rail === 'facilitator-cep18'
+          ? ', EIP-712 CEP-18 payment verified + settled on-chain by the Casper x402 facilitator (gas sponsored)'
+          : x402.facilitator
+            ? `, via Casper x402 facilitator (${x402.facilitator.network})`
+            : '';
       const tx = await anchor('oracle', 'FEED_CONFIRMED', sev, Math.round(oracle.pegDeviation * 10000));
       push({
         agent: 'Oracle',
