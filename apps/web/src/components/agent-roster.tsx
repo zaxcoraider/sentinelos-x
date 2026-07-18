@@ -21,7 +21,7 @@ import {
 import { IconTile, PanelCard } from '@/components/mc/panel';
 import { cn } from '@/lib/utils';
 
-interface AgentCard {
+export interface AgentCard {
   name: string;
   role: string;
   blurb: string;
@@ -34,7 +34,8 @@ interface AgentCard {
 
 // All twelve agents are live and anchor a real record_action on Casper. Treasury
 // and Governance take protocol actions; the rest contribute real data/analysis.
-const AGENTS: AgentCard[] = [
+// Shared with the Marketplace page, which lists the same team as store listings.
+export const AGENTS: AgentCard[] = [
   { name: 'Commander', role: 'Orchestrator · CEO', blurb: 'Routes work across the team and decides who acts — a deterministic threshold gate for auditable control flow.', icon: Compass, tone: '96, 165, 250', color: 'text-blue-400' },
   { name: 'Oracle', role: 'Live data feed', blurb: 'Acquires the premium market feed over x402 and confirms the live peg + reference price on-chain.', icon: Radio, tone: '56, 189, 248', color: 'text-sky-400' },
   { name: 'Risk', role: 'Threat scoring', blurb: 'Scores event severity 0–100 with a grounded rationale. Powered by Claude.', icon: ShieldAlert, tone: '251, 191, 36', color: 'text-amber-400' },
@@ -110,7 +111,7 @@ export function AgentRoster({ totalActions }: { totalActions: number | null }) {
 
       <section className="flex flex-col gap-4">
         <SectionHeader icon={Store} title="Marketplace · publish your own in v1" />
-        <PanelCard className="opacity-70">
+        <PanelCard>
           <div className="flex flex-col gap-2 p-6">
             <div className="text-sm font-semibold text-foreground">Agent Store &amp; Developer SDK</div>
             <p className="max-w-2xl text-sm text-muted-foreground">
@@ -118,9 +119,12 @@ export function AgentRoster({ totalActions }: { totalActions: number | null }) {
               team can publish a new agent to the marketplace and any protocol can install the agents it
               needs — the OS layer that turns this from a product into a platform.
             </p>
-            <div className="mt-1 w-fit cursor-not-allowed rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground/60">
-              Publish an agent — Coming in v1
-            </div>
+            <a
+              href="/marketplace"
+              className="mt-1 w-fit rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            >
+              Browse the Marketplace preview →
+            </a>
           </div>
         </PanelCard>
       </section>

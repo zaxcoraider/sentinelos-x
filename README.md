@@ -248,7 +248,10 @@ flowchart TD
 | **Agent Team** — the 12 live agents + a marketplace/SDK preview | 🟢 Live |
 | **Governance Council** — AI council debates the response and submits a motion on-chain | 🟢 Live |
 | **Security Center** — threat radar over on-chain state + live event log | 🟢 Live |
-| Analytics · Marketplace checkout · Developer SDK · Settings | 🔵 Coming in v1 |
+| **Analytics** — real on-chain aggregates (per-agent activity, success rate, incident economics) | 🟢 Live |
+| **Marketplace** — the 12 agents listed at their real SOSC fees + v1 store preview | 🟡 Preview |
+| **Settings** — live runtime config + the v1 autonomy dial | 🟡 Preview |
+| Marketplace checkout · Developer SDK | 🔵 Coming in v1 |
 
 ---
 
@@ -264,7 +267,10 @@ Everything below extends something already live in this repo — not a wishlist.
 - **Full on-chain governance** — token-weighted voting, timelocks, auto-execution of what
   passes. *(Today Governance drafts + anchors the proposal.)*
 - **Configurable autonomy** — a policy dial that auto-executes under a risk threshold and
-  human-gates above it. *(Today a human approves every action.)*
+  human-gates above it. *(Today a human approves every action; the dial is previewed in Settings.)*
+- **Reputation-based payroll** — every agent's anchored `record_action` history becomes its on-chain
+  track record: SOSC fees float on performance, and published agents stake SOSC that a provably bad
+  call slashes. *(Extends the live a2a payroll — the fee rail and the on-chain résumé both exist today.)*
 
 **The vision**
 - **Provable AI operations** — a tamper-proof, on-chain record of *why* every autonomous

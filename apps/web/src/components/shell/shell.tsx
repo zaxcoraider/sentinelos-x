@@ -24,7 +24,8 @@ interface NavItem {
   label: string;
   href: string;
   icon: LucideIcon;
-  roadmap?: boolean;
+  /** v1-preview module — navigable, but badged so it never oversells. */
+  preview?: boolean;
 }
 
 const LIVE_NAV: NavItem[] = [
@@ -35,10 +36,10 @@ const LIVE_NAV: NavItem[] = [
   { label: 'Security Center', href: '/security', icon: ShieldAlert },
 ];
 
-const ROADMAP_NAV: NavItem[] = [
-  { label: 'Analytics', href: '#', icon: BarChart3, roadmap: true },
-  { label: 'Marketplace', href: '#', icon: Store, roadmap: true },
-  { label: 'Settings', href: '#', icon: Settings, roadmap: true },
+const MODULE_NAV: NavItem[] = [
+  { label: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { label: 'Marketplace', href: '/marketplace', icon: Store, preview: true },
+  { label: 'Settings', href: '/settings', icon: Settings, preview: true },
 ];
 
 // A gentle, stable curve for the sidebar health sparkline.
@@ -46,20 +47,6 @@ const HEALTH_SERIES = [82, 85, 83, 88, 90, 87, 92, 94, 91, 95, 96, 98];
 
 function NavLink({ item, active }: { item: NavItem; active: boolean }) {
   const Icon = item.icon;
-  if (item.roadmap) {
-    return (
-      <div
-        className="flex cursor-not-allowed items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground/40"
-        title="Coming in v1"
-      >
-        <span className="flex items-center gap-3">
-          <Icon className="h-4 w-4" />
-          {item.label}
-        </span>
-        <span className="rounded-full border border-border px-1.5 py-0.5 text-[9px] uppercase tracking-wide">v1</span>
-      </div>
-    );
-  }
   return (
     <a
       href={item.href}
@@ -78,7 +65,13 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
       )}
       <Icon className={cn('h-4 w-4 transition-colors', active ? 'text-primary' : 'group-hover:text-foreground')} />
       {item.label}
-      {active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />}
+      {active ? (
+        <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
+      ) : item.preview ? (
+        <span className="ml-auto rounded-full border border-border px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-muted-foreground/60">
+          preview
+        </span>
+      ) : null}
     </a>
   );
 }
@@ -232,8 +225,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="px-3 pb-1 pt-4 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
             Modules
           </div>
-          {ROADMAP_NAV.map((item) => (
-            <NavLink key={item.label} item={item} active={false} />
+          {MODULE_NAV.map((item) => (
+            <NavLink key={item.label} item={item} active={isActive(item.href)} />
           ))}
 
           <div className="mt-auto flex flex-col gap-3">
