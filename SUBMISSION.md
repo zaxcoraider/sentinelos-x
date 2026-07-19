@@ -1,8 +1,8 @@
 # SentinelOS — Submission Kit
 
-The judge-facing answers for the **Casper Agentic Buildathon 2026** (Agentic AI track) —
-copy these into the DoraHacks form. (The video script + recording checklist live in the
-local, gitignored `SUBMISSION_NOTES.md`.)
+The judge-facing answers for the **Casper Agentic Buildathon 2026 — Final Round**
+(Casper Innovation Track) — copy these into the DoraHacks form. (The video script +
+recording checklist live in the local, gitignored `SUBMISSION_NOTES.md`.)
 
 ---
 
@@ -13,7 +13,7 @@ local, gitignored `SUBMISSION_NOTES.md`.)
 **Tagline (one line):** An autonomous operating system for Web3 — a team of AI agents that
 detect a stablecoin depeg, pay for data over x402, and execute the fix on Casper in seconds.
 
-**Track:** Agentic AI
+**Track:** Casper Innovation Track
 
 **Elevator pitch (2–3 sentences):**
 Most Web3 AI projects answer questions; SentinelOS runs the protocol. When a stablecoin
@@ -24,7 +24,9 @@ new ones.
 
 **What it does:**
 - A **12-agent team** runs an autonomous crisis loop over an on-chain treasury, and **every
-  agent anchors its own `record_action` on Casper** — one incident, ~12 verifiable transactions.
+  agent anchors its own `record_action` on Casper** — one incident, **~24 verifiable
+  transactions** (12 agent anchors + 11 agent-to-agent SOSC payroll settlements + the x402
+  data purchase).
 - Oracle pulls **real live market data** (CoinGecko ETH vol + USDC peg) over **x402** (paid via
   the official Casper facilitator); Analytics quantifies the anomaly; Risk scores it; Commander
   routes; Treasury decides + executes the protective action on-chain; six domain agents
@@ -38,7 +40,10 @@ new ones.
   `transfer_with_authorization`, verified + settled + **gas-sponsored by the official Casper
   x402 facilitator**. One incident = 11 agent-to-agent payments on-chain, streamed live in the UI.
 - A Next.js "Mission Control" dashboard streams the whole trace live — an animated 12-node agent
-  network, reasoning panel, and event timeline — and links every action to cspr.live.
+  network, reasoning panel, and event timeline — and links every action to cspr.live. Beyond
+  Mission Control: an **Analytics** page (real on-chain aggregates), an **agent Marketplace**
+  (the 12 agents at their real SOSC fees), **Settings** (autonomy-dial preview), and a live
+  notifications bell fed by real `record_action` events.
 - The monitored asset is real USDC (live peg); the depeg is a clearly-labeled stress drill.
 
 **How Casper 2.0 is used:**
@@ -58,7 +63,7 @@ on-chain event feed), Odra, live handshake to the official **Casper x402 facilit
 - Contract package: https://testnet.cspr.live/contract-package/7f56caa1d89d394786354bc382b1896fcd21fd77d0cea33c41a54e28c56990db
 - Demo video: https://youtu.be/kM4nOijX2M4
 
-**Verifiable on-chain (one live incident — 12 agents, 12 transactions, `total_actions` 8→20):**
+**Verifiable on-chain (one live incident — 12 agents, ~24 transactions incl. payroll):**
 - Treasury `REBALANCE` — https://testnet.cspr.live/transaction/558753bf1aa084563dad75bbd978db914be112a505fc21b70d116c67b4875161
 - Governance `PROPOSAL` — https://testnet.cspr.live/transaction/996dff137cfda9869a2c0eadfe7fa8f9c84971bf1fecd675f95a28069c2416e2
 - Oracle `FEED_CONFIRMED` — https://testnet.cspr.live/transaction/1c6132d49f804de4191e831a0d77985bd4e7c713bfa967e53e596239bbeaa00b
