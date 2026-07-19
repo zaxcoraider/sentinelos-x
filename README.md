@@ -17,7 +17,7 @@ on-chain transaction.
 [![Live Demo](https://img.shields.io/badge/▶%20LIVE%20DEMO-sentinelos--x--web.vercel.app-2563EB?style=for-the-badge&logo=vercel&logoColor=white)](https://sentinelos-x-web.vercel.app/)
 [![Watch the demo](https://img.shields.io/badge/▶%20WATCH-Demo%20video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/kM4nOijX2M4)
 [![Casper 2.0](https://img.shields.io/badge/Built%20on-Casper%202.0-FF0012?style=for-the-badge)](https://casper.network)
-[![Buildathon 2026](https://img.shields.io/badge/Agentic%20Buildathon-2026-8B5CF6?style=for-the-badge)](https://dorahacks.io/hackathon/casper-agentic-buildathon)
+[![Buildathon Finalist](https://img.shields.io/badge/Agentic%20Buildathon%202026-🏆%20FINALIST-8B5CF6?style=for-the-badge)](https://dorahacks.io/hackathon/casper-agentic-buildathon-finals)
 
 ![Odra](https://img.shields.io/badge/Odra-Rust%20%C2%B7%20WASM-000000?logo=rust&logoColor=white)
 ![x402](https://img.shields.io/badge/x402-Micropayments-06B6D4)
@@ -34,14 +34,33 @@ on-chain transaction.
 
 ---
 
-Built for the **Casper Agentic Buildathon 2026** (Agentic AI track) on **Casper Network 2.0**
-(Rust → WASM via [Odra](https://odra.dev)). Not EVM, not Solana.
+Built for the **Casper Agentic Buildathon 2026** — 🏆 **qualified for the [Final Round](https://dorahacks.io/hackathon/casper-agentic-buildathon-finals)**
+(Casper Innovation Track) — on **Casper Network 2.0** (Rust → WASM via [Odra](https://odra.dev)).
+Not EVM, not Solana.
 
 > **Live today:** a full **12-agent team** — each one anchors its own action to the on-chain
 > `TreasuryGuard` contract during an incident, and **gets paid real SOSC for it** over the
 > official Casper x402 facilitator · a multi-page dashboard. **One incident → ~24 verifiable
 > transactions** (12 agent anchors + 11 agent-to-agent payments + the premium-data payment) on
 > [cspr.live](https://testnet.cspr.live) — confirmed 12/12 + 11/11 from the production app.
+
+---
+
+## 🆕 What's new for the Final Round
+
+Everything below shipped **between the qualification round (July 4) and the finals** — the
+demo video predates it, so the best place to see it is the
+**[live app](https://sentinelos-x-web.vercel.app/)**:
+
+| Upgrade | What changed |
+|---------|--------------|
+| 💠 **Full x402 settlement** | Deployed **[SOSC](https://testnet.cspr.live/contract-package/640f52609a8f975869ad26216816cd81e340e4a8183be75886fd5dc1944dc3e0)**, our own CEP-18 token, and moved from the 402 handshake to **end-to-end settlement**: EIP-712 `transfer_with_authorization` → facilitator `/verify` → `/settle`, **gas sponsored by the official Casper x402 facilitator** |
+| 💸 **Agent-to-agent economy** | All 11 specialists now own **their own Casper wallets** and the Commander **pays each one a real SOSC fee per incident** — [11 on-chain payroll settlements](#-the-agent-to-agent-x402-economy--agents-dont-work-for-free), streamed live in the Agent Economy panel |
+| 📈 **2× the on-chain footprint** | One incident: **~12 → ~24 verifiable transactions** (12 anchors + 11 payroll + the data purchase) — production-confirmed **12/12 anchors + 11/11 payments** with automatic anchor retry |
+| 🖥 **Mission Control overhaul** | Living dashboard — animated 12-node radial agent network, live reasoning stream, cinematic UI |
+| 🧩 **Three new modules** | **[Analytics](https://sentinelos-x-web.vercel.app/analytics)** (real on-chain aggregates) · **[Marketplace](https://sentinelos-x-web.vercel.app/marketplace)** (the 12 agents at their real SOSC fees — the open-marketplace preview) · **[Settings](https://sentinelos-x-web.vercel.app/settings)** (configurable autonomy-dial preview) |
+| 🔔 **Live notifications** | Header bell fed by **real `record_action` events** from the chain + a live USDC peg-status pill |
+| 📚 **Docs & polish** | MIT license · full [on-chain proof table](#-on-chain-proof--every-agent-anchors-its-action) · roadmap incl. **reputation-based agent payroll** |
 
 ---
 
